@@ -27,10 +27,20 @@ private:
     void parse_main(const std::string& line, int address, bool& found_main);
     void parse_iostream(const std::string& line, bool& found_iostream);
     bool is_number(const std::string& expression);
-    void bool_expression_pars(const std::string& type_name, const std::string& expression);
-    void char_expression_pars(const std::string& type_name, const std::string& expression);
-    void int_expression_pars(const std::string& type_name, const std::string& expression);
+    void bool_expression_pars(const std::string& name, const std::string& expression);
+    void char_expression_pars(const std::string& name, const std::string& expression);
+    void int_expression_pars(const std::string& name, const std::string& expression);
+    void float_expression_pars(const std::string& name, const std::string& expression);
+    void double_expression_pars(const std::string& name, const std::string& expression);
+    void string_expression_pars(const std::string& name, const std::string& expression);
 
+    bool is_float_variable(const std::string& expression);
+    bool is_char_variable(const std::string& expression);
+    bool is_bool_variable(const std::string& expression);
+    bool is_int_variable(const std::string& expression);
+    bool is_double_variable(const std::string& expression);
+    bool is_string_variable(const std::string& expression);
+    
 public:
     void print_bool_map();
     void print_char_map();
@@ -43,9 +53,9 @@ private:
     std::string m_input;
     std::unordered_map<std::string, bool> bool_variables;
     std::unordered_map<std::string, char> char_variables;
-    std::unordered_map<std::string, std::string> int_variables;
-    std::unordered_map<std::string, std::string> float_variables;
-    std::unordered_map<std::string, std::string> double_variables;
+    std::unordered_map<std::string, int> int_variables;
+    std::unordered_map<std::string, float> float_variables;
+    std::unordered_map<std::string, double> double_variables;
     std::unordered_map<std::string, std::string> string_variables;
 };
 

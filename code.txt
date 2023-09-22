@@ -2,11 +2,14 @@
 
 int main() {
     char a = 'l';
-    char k = 'a';
+    char k = 'p';
     bool b = true;
-    int tmp = 40;
+    int tmp = 400;
+    int l = tmp;
     double c = 3.24;
-    bool d = 56;
+    bool d = b;
     string  st = "hello";
-    char ch = 'k';
+    float f = 8.34;
+    float g = f;
+    string str = "2023";
 }

@@ -25,7 +25,8 @@ int main(int argc, char **argv)
     parser.print_bool_map();
     parser.print_double_map();
     parser.print_char_map();
-    //parser.print_float_map();
+    parser.print_float_map();
+    parser.print_string_map();
 
     return 0;
 }
