@@ -111,7 +111,12 @@ void Parser::bool_expression_pars(const std::string& name, const std::string& ex
     } else {
         throw std::invalid_argument("Invalid boolean expression: " + expression);
     }
-    bool_variables[name] = tmp;
+
+    if (!defined_variable(name)) {
+        bool_variables[name] = tmp;
+    } else {
+        throw std::runtime_error("Redefinition");
+    }
 }
 
 bool Parser::is_bool_variable(const std::string& expression)
@@ -129,6 +134,8 @@ void Parser::char_expression_pars(const std::string& name, const std::string& ex
         if (char_var_it != char_variables.end()) {
             tmp = char_var_it->second;
         }
+    } else if (expression.empty()) {
+        tmp = ' ';
     } else {
         throw std::invalid_argument("Invalid char expression: " + expression);
     }
@@ -142,12 +149,19 @@ bool Parser::is_char_variable(const std::string& expression)
 
 void Parser::int_expression_pars(const std::string& name, const std::string& expression)
 {
+    if (defined_variable(name)) {
+        throw std::runtime_error("Redefinition");
+    }
+
     if (is_int_variable(expression)) {
         auto int_var_it = int_variables.find(expression);
         if (int_var_it != int_variables.end()) {
             int_variables[name] = int_var_it->second;
             return;
         }
+    } else if (expression.empty()) {
+        int_variables[name] = 0;
+        return;
     }
 
     try {
@@ -167,12 +181,19 @@ bool Parser::is_int_variable(const std::string& expression)
 
 void Parser::float_expression_pars(const std::string& name, const std::string& expression)
 {
+    if (defined_variable(name)) {
+        throw std::runtime_error("Redefinition");
+    }
+
     if (is_float_variable(expression)) {
         auto float_var_it = float_variables.find(expression);
         if (float_var_it != float_variables.end()) {
             float_variables[name] = float_var_it->second;
             return;
         }
+    } else if (expression.empty()) {
+        float_variables[name] = 0.0;
+        return;
     }
 
     try {
@@ -192,12 +213,19 @@ bool Parser::is_float_variable(const std::string& expression)
 
 void Parser::double_expression_pars(const std::string& name, const std::string& expression)
 {
+    if (defined_variable(name)) {
+        throw std::runtime_error("Redefinition");
+    }
+
     if (is_double_variable(expression)) {
         auto double_var_it = double_variables.find(expression);
         if (double_var_it != double_variables.end()) {
             double_variables[name] = double_var_it->second;
             return;
         }
+    }  else if (expression.empty()) {
+        double_variables[name] = 0.0;
+        return;
     }
 
     try {
@@ -217,6 +245,10 @@ bool Parser::is_double_variable(const std::string& expression)
 
 void Parser::string_expression_pars(const std::string& name, const std::string& expression)
 {
+    if (defined_variable(name)) {
+        throw std::runtime_error("Redefinition");
+    }
+
     if (expression.size() >= 2 && expression.front() == '"' && expression.back() == '"') {
         // Valid string expression enclosed in double quotes
         std::string value = expression.substr(1, expression.size() - 2);
@@ -227,6 +259,8 @@ void Parser::string_expression_pars(const std::string& name, const std::string& 
         if (string_var_it != string_variables.end()) {
             string_variables[name] = string_var_it->second;
         }
+    } else if (expression.empty()) {
+        string_variables[name] = " ";
     } else {
         // Invalid string expression
         throw std::invalid_argument("Invalid string expression: " + expression);
@@ -290,6 +324,14 @@ void Parser::parse()
             if (is_variable_declaration(line, address)) {
                 parse_variable_declaration(line, address);
             }
+
+            if (is_variable_definition(line, address)) {
+                parse_variable_definition(line, address);
+            }
+
+            if (is_operations(line, address)) {
+                std::cout << "you are here" << std::endl;
+            }
             ++address;
         }
     } catch (const std::exception& e) {
@@ -300,9 +342,9 @@ void Parser::parse()
 
 void Parser::print_int_map()
 {
-    std::cout << "int" << std::endl;
+    std::cout << "\nint" << std::endl;
     for(auto& elem : int_variables) {
-        std::cout << "Key: " << elem.first << " " << ", val: " << elem.second << std::endl;
+        std::cout << "Key: " << elem.first << ", val: " << elem.second << std::endl;
     }
     std::cout << std::endl;
 }
@@ -311,7 +353,7 @@ void Parser::print_char_map()
 {
     std::cout << "char" << std::endl;
     for(auto& elem : char_variables) {
-        std::cout << "Key: " << elem.first << " " << ", val: " << elem.second << std::endl;
+        std::cout << "Key: " << elem.first << ", val: " << elem.second << std::endl;
     }
     std::cout << std::endl;
 }
@@ -320,7 +362,7 @@ void Parser::print_bool_map()
 {
     std::cout << "bool" << std::endl;
     for(auto& elem : bool_variables) {
-        std::cout << "Key: " << elem.first << " " << ", val: " << elem.second << std::endl;
+        std::cout << "Key: " << elem.first << ", val: " << elem.second << std::endl;
     }
     std::cout << std::endl;
 }
@@ -329,7 +371,7 @@ void Parser::print_float_map()
 {
     std::cout << "float" << std::endl;
     for(auto& elem : float_variables) {
-        std::cout << "Key: " << elem.first << " " << ", val: " << elem.second << std::endl;
+        std::cout << "Key: " << elem.first << ", val: " << elem.second << std::endl;
     }
     std::cout << std::endl;
 }
@@ -338,7 +380,7 @@ void Parser::print_double_map()
 {
     std::cout << "double" << std::endl;
     for(auto& elem : double_variables) {
-        std::cout << "Key: " << elem.first << " " << ", val: " << elem.second << std::endl;
+        std::cout << "Key: " << elem.first << ", val: " << elem.second << std::endl;
     }
     std::cout << std::endl;
 }
@@ -404,4 +446,196 @@ bool Parser::is_main(const std::string& line, int address)
         return true;  // Correct end of main function
     }
     return false;
+}
+
+bool Parser::is_variable_definition(const std::string& line, int address)
+{
+    std::string op1;
+    std::string assignment;
+    std::string op2;
+    std::string st1;
+    std::string st2;
+
+    std::istringstream iss(line);
+    iss >> op1 >> assignment >> op2 >> st1 >> st2;
+
+    if (defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
+        if (line[line.size() - 1] != ';') {
+            throw std::runtime_error("You forgot the ; in the following line:");
+        }
+        return true;
+    }
+    return false;
+}
+
+bool Parser::is_operations(const std::string& line, int address)
+{
+    std::string op1;
+    std::string assignment;
+    std::string op2;
+    std::string st1;
+    std::string st2;
+
+    std::istringstream iss(line);
+    iss >> op1 >> assignment >> op2 >> st1 >> st2;
+
+    if (defined_variable(op1) && !assignment.empty() && !op2.empty() && !st1.empty() && !st2.empty()) {
+        if (line[line.size() - 1] != ';') {
+            throw std::runtime_error("You forgot the ; in the following line:");
+        }
+        return true;
+    }
+    return false;
+}
+
+void Parser::parse_variable_definition(const std::string& line, int address)
+{
+    std::string op1;
+    std::string assignment;
+    std::string op2;
+
+    std::istringstream iss(line);
+    iss >> op1 >> assignment >> op2; 
+    op2.erase(std::remove(op2.begin(), op2.end(), ';'), op2.end());
+
+    if (assignment == "=") {
+       assignment_operator_pars(op1, op2);
+    } else if (assignment == "+=") {
+        plus_assignment_operator_pars(op1, op2);
+    }
+}
+
+void Parser::plus_assignment_operator_pars(const std::string& op1, const std::string& op2)
+{
+    if (is_int_variable(op1)) {
+        if (is_int_variable(op2)) {
+            int_variables[op1] += int_variables[op2];
+        } else if (is_number(op2)) {
+            int_variables[op1] += std::stoi(op2);
+        } else if (is_char_variable(op2)) {
+            int_variables[op1] += char_variables[op2];
+        }
+    } else if (is_bool_variable(op1)) {
+        if (is_bool_variable(op2)) {
+            bool_variables[op1] = bool_variables[op2];
+        } else if (is_number(op2)) {
+            bool_variables[op1] = 1;
+        }
+    } else if (is_double_variable(op1)) {
+        if (is_double_variable(op2)) {
+            double_variables[op1] += double_variables[op2];
+        } else if (is_number(op2)) {
+            double_variables[op1] += std::stod(op2);
+        } else if (is_double_literal(op2)) {
+            double_variables[op1] += std::stod(op2);
+        }
+    } else if (is_float_variable(op1)) {
+        if (is_float_variable(op2)) {
+            float_variables[op1] += float_variables[op2];
+        } else if (is_number(op2)) {
+            float_variables[op1] += std::stof(op2);
+        }
+    } else if (is_char_variable(op1)) {
+        if (is_char_variable(op2)) {
+            char_variables[op1] += char_variables[op2];
+        }
+    } else {
+        throw std::runtime_error("Not declare variable");
+    }
+}
+
+void Parser::minus_assignment_operator_pars(const std::string& op1, const std::string& op2)
+{
+    if (is_int_variable(op1)) {
+        if (is_int_variable(op2)) {
+            int_variables[op1] -= int_variables[op2];
+        } else if (is_number(op2)) {
+            int_variables[op1] -= std::stoi(op2);
+        } else if (is_char_variable(op2)) {
+            int_variables[op1] -= char_variables[op2];
+        }
+    } else if (is_bool_variable(op1)) {
+        if (is_bool_variable(op2)) {
+            bool_variables[op1] = bool_variables[op2];
+        } else if (is_number(op2)) {
+            bool_variables[op1] = 1;
+        }
+    } else if (is_double_variable(op1)) {
+        if (is_double_variable(op2)) {
+            double_variables[op1] -= double_variables[op2];
+        } else if (is_number(op2)) {
+            double_variables[op1] -= std::stod(op2);
+        } else if (is_double_literal(op2)) {
+            double_variables[op1] -= std::stod(op2);
+        }
+    } else if (is_float_variable(op1)) {
+        if (is_float_variable(op2)) {
+            float_variables[op1] -= float_variables[op2];
+        } else if (is_number(op2)) {
+            float_variables[op1] -= std::stof(op2);
+        }
+    } else if (is_char_variable(op1)) {
+        if (is_char_variable(op2)) {
+            char_variables[op1] -= char_variables[op2];
+        }
+    } else {
+        throw std::runtime_error("Not declare variable");
+    }
+}
+
+void Parser::assignment_operator_pars(const std::string& op1, const std::string& op2)
+{
+    if (is_int_variable(op1)) {
+        if (is_int_variable(op2)) {
+            int_variables[op1] = int_variables[op2];
+        } else if (is_number(op2)) {
+            int_variables[op1] = std::stoi(op2);
+        } else if (is_char_variable(op2)) {
+            int_variables[op1] = char_variables[op2];
+        }
+    } else if (is_bool_variable(op1)) {
+        if (is_bool_variable(op2)) {
+            bool_variables[op1] = bool_variables[op2];
+        } else if (is_number(op2)) {
+            bool_variables[op1] = 1;
+        }
+    } else if (is_double_variable(op1)) {
+        if (is_double_variable(op2)) {
+            double_variables[op1] = double_variables[op2];
+        } else if (is_number(op2)) {
+            double_variables[op1] = std::stod(op2);
+        } else if (is_double_literal(op2)) {
+            double_variables[op1] = std::stod(op2);
+        }
+    } else if (is_float_variable(op1)) {
+        if (is_float_variable(op2)) {
+            float_variables[op1] = float_variables[op2];
+        } else if (is_number(op2)) {
+            float_variables[op1] = std::stof(op2);
+        }
+    } else if (is_char_variable(op1)) {
+        if (is_char_variable(op2)) {
+            char_variables[op1] = char_variables[op2];
+        }
+    } else {
+        throw std::runtime_error("Not declare variable");
+    }
+}
+
+bool Parser::is_double_literal(const std::string& expression)
+{
+    try {
+        // Attempt to convert the string to a double
+        double value = std::stod(expression);  
+        return true;
+    } catch (const std::invalid_argument&) {
+        return false;
+    } catch (const std::out_of_range&) {
+        return false;
+    }
+}
+
+bool Parser::defined_variable(const std::string& name)
+{
+    return (is_bool_variable(name) || is_char_variable(name) || is_int_variable(name) || is_float_variable(name) || is_double_variable(name) || is_string_variable(name));
 }

@@ -1,15 +1,13 @@
 #include <iostream>
 
 int main() {
-    char a = 'l';
-    char k = 'p';
-    bool b = true;
-    int tmp = 400;
-    int l = tmp;
-    double c = 3.24;
-    bool d = b;
-    string  st = "hello";
-    float f = 8.34;
-    float g = f;
-    string str = "2023";
+
+    int x  = 20;
+    int y  = 50;
+
+    x += y;
+    y -= x;
+
+    x = x + 10;
+
 }
