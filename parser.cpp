@@ -274,16 +274,17 @@ bool Parser::is_string_variable(const std::string& expression)
 
 bool Parser::is_number(const std::string& expression)
 {
-    if (expression.size() > 1 && expression[0] == '0') {
-        return false;
+    if (expression.empty()) {
+        return false; // Empty string is not a number
     }
 
-    for (int i = 1; i < expression.size(); ++i) {
-        if ('0' > expression[i] || expression[i] > '9') {
-            return false;
+    for (char ch : expression) {
+        if (ch < '0' || ch > '9') {
+            return false; // Non-digit character found
         }
     }
-    return true;
+
+    return true; // All characters are digits
 }
 
 void Parser::parse()
@@ -326,11 +327,12 @@ void Parser::parse()
             }
 
             if (is_variable_definition(line, address)) {
+                std::cout << "yes" << std::endl;
                 parse_variable_definition(line, address);
             }
 
-            if (is_operations(line, address)) {
-                std::cout << "you are here" << std::endl;
+            if (is_assignment_expression(line, address)) {
+                parse_expression(line, address);
             }
             ++address;
         }
@@ -464,28 +466,115 @@ bool Parser::is_variable_definition(const std::string& line, int address)
             throw std::runtime_error("You forgot the ; in the following line:");
         }
         return true;
+    } else if (!defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
+        throw std::runtime_error("Not declare variable " + op1);
     }
     return false;
 }
 
-bool Parser::is_operations(const std::string& line, int address)
+bool Parser::is_assignment_expression(const std::string& line, int address)
 {
     std::string op1;
     std::string assignment;
     std::string op2;
-    std::string st1;
-    std::string st2;
+    std::string extra_token1;
+    std::string extra_token2;
 
     std::istringstream iss(line);
-    iss >> op1 >> assignment >> op2 >> st1 >> st2;
+    iss >> op1 >> assignment >> op2 >> extra_token1 >> extra_token2;
 
-    if (defined_variable(op1) && !assignment.empty() && !op2.empty() && !st1.empty() && !st2.empty()) {
+    if (defined_variable(op1) && !assignment.empty() && !op2.empty() && !extra_token1.empty() && !extra_token2.empty()) {
         if (line[line.size() - 1] != ';') {
-            throw std::runtime_error("You forgot the ; in the following line:");
+            throw std::runtime_error("You forgot the ; in the following line: " + address);
         }
         return true;
     }
     return false;
+}
+
+// x = y + z, x += y + z, x -= y + z
+void Parser::parse_expression(const std::string& line, int address)
+{
+    std::string op1;
+    std::string some_operator1;
+    std::string op2;
+    std::string some_operator2;
+    std::string op3;
+
+    std::istringstream iss(line);
+    iss >> op1 >> some_operator1 >> op2 >> some_operator2 >> op3;
+    op3.erase(std::remove(op3.begin(), op3.end(), ';'), op3.end());
+    
+    if (some_operator1 == "=") {
+        parse_assignment_expression(op1, op2, some_operator2, op3);
+    }
+}
+
+void Parser::parse_assignment_expression(const std::string& op1, const std::string& op2, const std::string& some_operator, const std::string& op3)
+{
+    if (is_int_variable(op1)) {
+        if (some_operator == "+") {
+            handle_int_addition(op1, op2, op3);
+        } else if (some_operator == "-") {
+            handle_int_subtraction(op1, op2, op3);
+        } else if (some_operator == "*") {
+            handle_int_multiplication(op1, op2, op3);
+        } else if (some_operator == "/") {
+            handle_int_division(op1, op2, op3);
+        }
+    }
+}
+
+void Parser::handle_int_addition(const std::string& op1, const std::string& op2, const std::string& op3)
+{
+    if (is_int_variable(op2) && is_int_variable(op3)) {
+        int_variables[op1] = int_variables[op2] + int_variables[op3];
+    } else if (is_int_variable(op2) && is_number(op3)) {
+        int_variables[op1] = int_variables[op2] + std::stoi(op3);
+    } else if (is_number(op2) && is_number(op3)) {
+        int_variables[op1] = std::stoi(op2) + std::stoi(op3);
+    } else if (is_number(op2) && is_int_variable(op3)) {
+        int_variables[op1] = std::stoi(op2) + int_variables[op3];
+    } 
+}
+
+void Parser::handle_int_subtraction(const std::string& op1, const std::string& op2, const std::string& op3)
+{
+    if (is_int_variable(op2) && is_int_variable(op3)) {
+        int_variables[op1] = int_variables[op2] - int_variables[op3];
+    } else if (is_int_variable(op2) && is_number(op3)) {
+        int_variables[op1] = int_variables[op2] - std::stoi(op3);
+    } else if (is_number(op2) && is_number(op3)) {
+        int_variables[op1] = std::stoi(op2) - std::stoi(op3);
+    } else if (is_number(op2) && is_int_variable(op3)) {
+        int_variables[op1] = std::stoi(op2) - int_variables[op3];
+    } 
+}
+
+void Parser::handle_int_multiplication(const std::string& op1, const std::string& op2, const std::string& op3)
+{
+    if (is_int_variable(op2) && is_int_variable(op3)) {
+        int_variables[op1] = int_variables[op2] * int_variables[op3];
+    } else if (is_int_variable(op2) && is_number(op3)) {
+        int_variables[op1] = int_variables[op2] * std::stoi(op3);
+    } else if (is_number(op2) && is_number(op3)) {
+        int_variables[op1] = std::stoi(op2) * std::stoi(op3);
+    } else if (is_number(op2) && is_int_variable(op3)) {
+        int_variables[op1] = std::stoi(op2) * int_variables[op3];
+    } 
+}
+
+void Parser::handle_int_division(const std::string& op1, const std::string& op2, const std::string& op3)
+{
+    if (is_int_variable(op2) && is_int_variable(op3)) {
+        int_variables[op1] = int_variables[op2] / int_variables[op3];
+    } else if (is_int_variable(op2) && is_number(op3)) {
+        int_variables[op1] = int_variables[op2] / std::stoi(op3);
+    } else if (is_number(op2) && is_number(op3)) {
+        int_variables[op1] = std::stoi(op2) / std::stoi(op3);
+    } else if (is_number(op2) && is_int_variable(op3)) {
+        int_variables[op1] = std::stoi(op2) / int_variables[op3];
+    } 
 }
 
 void Parser::parse_variable_definition(const std::string& line, int address)
@@ -626,7 +715,7 @@ bool Parser::is_double_literal(const std::string& expression)
 {
     try {
         // Attempt to convert the string to a double
-        double value = std::stod(expression);  
+        double value = std::stod(expression);
         return true;
     } catch (const std::invalid_argument&) {
         return false;

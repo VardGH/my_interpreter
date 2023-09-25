@@ -26,8 +26,8 @@ private:
     bool is_iostream(const std::string& line);
     bool is_main(const std::string& line, int address);
     
-    void parse_variable_declaration( std::string& line, int address);
-    void parse_variable_definition(const std::string& line, int address);
+    void parse_variable_declaration(std::string& line, int address); // int x = 10;
+    void parse_variable_definition(const std::string& line, int address); // x = y or x += 10
 
     void save_memory(const std::string& type, const std::string& type_name, const std::string& expression);
     void parse_main(const std::string& line, int address, bool& found_main);
@@ -54,7 +54,15 @@ private:
     void assignment_operator_pars(const std::string& op1, const std::string& op2);
     void plus_assignment_operator_pars(const std::string& op1, const std::string& op2);
     void minus_assignment_operator_pars(const std::string& op1, const std::string& op2);
-    bool is_operations(const std::string& line, int address);
+    bool is_assignment_expression(const std::string& line, int address);
+
+    // example x = y + z
+    void parse_assignment_expression(const std::string& op1, const std::string& op2, const std::string& some_operator, const std::string& op3);
+    void parse_expression(const std::string& line, int address);
+    void handle_int_addition(const std::string& target, const std::string& operand1, const std::string& operand2);
+    void handle_int_subtraction(const std::string& op1, const std::string& op2, const std::string& op3);
+    void handle_int_multiplication(const std::string& op1, const std::string& op2, const std::string& op3);
+    void handle_int_division(const std::string& op1, const std::string& op2, const std::string& op3);
     
 public:
     void print_bool_map();

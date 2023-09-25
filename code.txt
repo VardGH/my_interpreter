@@ -2,12 +2,10 @@
 
 int main() {
 
-    int x  = 20;
+    int x  = 100;
     int y  = 50;
+    int z = 90;
 
-    x += y;
-    y -= x;
-
-    x = x + 10;
+    x = 100 / 25;
 
 }
