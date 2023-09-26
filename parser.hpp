@@ -32,7 +32,6 @@ private:
     void save_memory(const std::string& type, const std::string& type_name, const std::string& expression);
     void parse_main(const std::string& line, int address, bool& found_main);
     void parse_iostream(const std::string& line, bool& found_iostream);
-    bool is_number(const std::string& expression);
 
     void bool_expression_pars(const std::string& name, const std::string& expression);
     void char_expression_pars(const std::string& name, const std::string& expression);
@@ -51,6 +50,9 @@ private:
     bool is_string_variable(const std::string& expression);
 
     bool is_double_literal(const std::string& expression);
+    bool is_char_literal(const std::string& expression);
+    bool is_number(const std::string& expression);
+
     void assignment_operator_pars(const std::string& op1, const std::string& op2);
     void plus_assignment_operator_pars(const std::string& op1, const std::string& op2);
     void minus_assignment_operator_pars(const std::string& op1, const std::string& op2);
@@ -59,10 +61,21 @@ private:
     // example x = y + z
     void parse_assignment_expression(const std::string& op1, const std::string& op2, const std::string& some_operator, const std::string& op3);
     void parse_expression(const std::string& line, int address);
+
     void handle_int_addition(const std::string& target, const std::string& operand1, const std::string& operand2);
     void handle_int_subtraction(const std::string& op1, const std::string& op2, const std::string& op3);
     void handle_int_multiplication(const std::string& op1, const std::string& op2, const std::string& op3);
     void handle_int_division(const std::string& op1, const std::string& op2, const std::string& op3);
+
+    void handle_double_addition(const std::string& op1, const std::string& op2, const std::string& op3);
+    void handle_double_subtraction(const std::string& op1, const std::string& op2, const std::string& op3);
+    void handle_double_multiplication(const std::string& op1, const std::string& op2, const std::string& op3);
+    void handle_double_division(const std::string& op1, const std::string& op2, const std::string& op3);
+
+    bool is_cout_expression(const std::string& line, int address);
+
+    template <typename T>
+    T get_value(const std::string& name);
     
 public:
     void print_bool_map();

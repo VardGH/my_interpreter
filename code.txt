@@ -4,8 +4,5 @@ int main() {
 
     int x  = 100;
     int y  = 50;
-    int z = 90;
-
-    x = 100 / 25;
 
 }
