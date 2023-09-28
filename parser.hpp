@@ -7,6 +7,7 @@
 class Parser
 {
 public:
+    // Constructors and operator overloads
     Parser(const std::string& input);
     Parser(const Parser& other) = delete;
     Parser& operator=(const Parser& other) = delete;
@@ -15,24 +16,26 @@ public:
     Parser& operator=(Parser&& other) = delete;
 
 public:
-    void parse();
+    void parse(); // Main parsing function
 
 private:
-    std::string trim(const std::string& str);
+    std::string trim(const std::string& str); // // Utility function for trimming whitespace from a string
 
+     // Functions for identifying different types of lines
     bool is_variable_declaration(std::string& line, int address);
-    bool is_variable_definition(const std::string& line, int address);
+    bool is_valid_line(const std::string& line, int address);
 
     bool is_iostream(const std::string& line);
     bool is_main(const std::string& line, int address);
     
+    // Functions for parsing specific line types
     void parse_variable_declaration(std::string& line, int address); // int x = 10;
     void parse_variable_definition(const std::string& line, int address); // x = y or x += 10
-
     void save_memory(const std::string& type, const std::string& type_name, const std::string& expression);
     void parse_main(const std::string& line, int address, bool& found_main);
     void parse_iostream(const std::string& line, bool& found_iostream);
 
+    // Functions for parsing expressions of different data types
     void bool_expression_pars(const std::string& name, const std::string& expression);
     void char_expression_pars(const std::string& name, const std::string& expression);
     void int_expression_pars(const std::string& name, const std::string& expression);
@@ -40,8 +43,10 @@ private:
     void double_expression_pars(const std::string& name, const std::string& expression);
     void string_expression_pars(const std::string& name, const std::string& expression);
 
+    // Function for checking if a variable is defined
     bool defined_variable(const std::string& name);
 
+    // Functions for checking the data type of an expression
     bool is_float_variable(const std::string& expression);
     bool is_char_variable(const std::string& expression);
     bool is_bool_variable(const std::string& expression);
@@ -53,6 +58,7 @@ private:
     bool is_char_literal(const std::string& expression);
     bool is_number(const std::string& expression);
 
+    // Functions for parsing assignment expressions
     void assignment_operator_pars(const std::string& op1, const std::string& op2);
     void plus_assignment_operator_pars(const std::string& op1, const std::string& op2);
     void minus_assignment_operator_pars(const std::string& op1, const std::string& op2);
@@ -62,20 +68,36 @@ private:
     void parse_assignment_expression(const std::string& op1, const std::string& op2, const std::string& some_operator, const std::string& op3);
     void parse_expression(const std::string& line, int address);
 
-    void handle_int_addition(const std::string& target, const std::string& operand1, const std::string& operand2);
-    void handle_int_subtraction(const std::string& op1, const std::string& op2, const std::string& op3);
-    void handle_int_multiplication(const std::string& op1, const std::string& op2, const std::string& op3);
-    void handle_int_division(const std::string& op1, const std::string& op2, const std::string& op3);
+    // Functions for parsing cout expressions
+    bool is_cout_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2);
+    void cout_expression_parse(std::string& expression);
 
-    void handle_double_addition(const std::string& op1, const std::string& op2, const std::string& op3);
-    void handle_double_subtraction(const std::string& op1, const std::string& op2, const std::string& op3);
-    void handle_double_multiplication(const std::string& op1, const std::string& op2, const std::string& op3);
-    void handle_double_division(const std::string& op1, const std::string& op2, const std::string& op3);
+    // Functions for parsing cin expressions
+    bool is_cin_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2);
+    void cin_expression_parse(std::string& expression);
 
-    bool is_cout_expression(const std::string& line, int address);
-
+    // Template function for retrieving variable values
     template <typename T>
-    T get_value(const std::string& name);
+    T get_value(const std::string& name)
+    {
+        if (is_int_variable(name)) {
+            return int_variables[name];
+        } else if (is_double_variable(name)) {
+            return double_variables[name];
+        } else if (is_bool_variable(name)) {
+            return bool_variables[name];
+        } else if (is_char_variable(name)) {
+            return char_variables[name];
+        } else if (is_number(name)) {
+            return std::stoi(name);
+        } else if (is_double_literal(name)) {
+            return std::stod(name);
+        } else if (is_char_literal(name)) {
+            return name[1];
+        } else {
+            throw std::runtime_error("Variable " + name + " is not defined.");
+        }
+    }
     
 public:
     void print_bool_map();

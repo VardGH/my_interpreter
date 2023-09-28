@@ -247,27 +247,25 @@ bool Parser::is_main(const std::string& line, int address)
     return false;
 }
 
-bool Parser::is_variable_definition(const std::string& line, int address)
+bool Parser::is_valid_line(const std::string& line, int address)
 {
-    std::string op1;
-    std::string assignment;
-    std::string op2;
-    std::string st1;
-    std::string st2;
+    std::string op1 {};
+    std::string assignment {};
+    std::string op2 {};
+    std::string st1 {};
+    std::string st2 {};
 
     std::istringstream iss(line);
     iss >> op1 >> assignment >> op2 >> st1 >> st2;
 
-    if (op1 == "std::cout" && assignment == "<<" ) {
-        op2.pop_back();
-        if (is_number(op2)) {
-            std::cout << "op2 " << op2 << std::endl;
-        } else if (is_int_variable(op2)) {
-            std::cout << "op2 " << int_variables[op2] << std::endl;
-        }
+    if (is_cout_expression(op1, assignment, op2, st1, st2)) {
+        cout_expression_parse(op2);
+    } else if (is_cin_expression(op1, assignment, op2, st1, st2)) {
+        std::cout << "----" << std::endl;
+        cin_expression_parse(op2);
     } else if (defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
         if (line[line.size() - 1] != ';') {
-            throw std::runtime_error("You forgot the ; in the following line:");
+            throw std::runtime_error("You forgot the ; in the following line:" + address);
         }
         return true;
     } 
@@ -319,23 +317,43 @@ void Parser::parse_assignment_expression(const std::string& op1, const std::stri
 {
     if (is_int_variable(op1)) {
         if (some_operator == "+") {
-            handle_int_addition(op1, op2, op3);
+            int_variables[op1] = get_value<int>(op2) + get_value<int>(op3);
         } else if (some_operator == "-") {
-            handle_int_subtraction(op1, op2, op3);
+            int_variables[op1] = get_value<int>(op2) - get_value<int>(op3);
         } else if (some_operator == "*") {
-            handle_int_multiplication(op1, op2, op3);
+            int_variables[op1] = get_value<int>(op2) * get_value<int>(op3);
         } else if (some_operator == "/") {
-            handle_int_division(op1, op2, op3);
+            int_variables[op1] = get_value<int>(op2) / get_value<int>(op3);
         }
     } else if (is_double_variable(op1)) {
         if (some_operator == "+") {
-            handle_double_addition(op1, op2, op3);
+            double_variables[op1] = get_value<double>(op2) + get_value<double>(op3);
         } else if (some_operator == "-") {
-            handle_double_subtraction(op1, op2, op3);
+            double_variables[op1] = get_value<double>(op2) - get_value<double>(op3);
         } else if (some_operator == "*") {
-            handle_double_multiplication(op1, op2, op3);
+            double_variables[op1] = get_value<double>(op2) * get_value<double>(op3);
         } else if (some_operator == "/") {
-            handle_double_division(op1, op2, op3);
+            double_variables[op1] = get_value<double>(op2) / get_value<double>(op3);
+        }
+    } else if (is_char_variable(op1)) {
+        if (some_operator == "+") {
+            char_variables[op1] = get_value<char>(op2) + get_value<char>(op3);
+        } else if (some_operator == "-") {
+            char_variables[op1] = get_value<char>(op2) - get_value<char>(op3);
+        } else if (some_operator == "*") {
+            char_variables[op1] = get_value<char>(op2) * get_value<char>(op3);
+        } else if (some_operator == "/") {
+            char_variables[op1] = get_value<char>(op2) / get_value<char>(op3);
+        }
+    } else if (is_float_variable(op1)) {
+        if (some_operator == "+") {
+            float_variables[op1] = get_value<float>(op2) + get_value<float>(op3);
+        } else if (some_operator == "-") {
+            float_variables[op1] = get_value<float>(op2) - get_value<float>(op3);
+        } else if (some_operator == "*") {
+            float_variables[op1] = get_value<float>(op2) * get_value<float>(op3);
+        } else if (some_operator == "/") {
+            float_variables[op1] = get_value<float>(op2) / get_value<float>(op3);
         }
     }
 }
@@ -421,7 +439,7 @@ void Parser::parse()
                 parse_variable_declaration(line, address);
             }
 
-            if (is_variable_definition(line, address)) {
+            if (is_valid_line(line, address)) {
                 parse_variable_definition(line, address);
             } 
 
@@ -439,34 +457,79 @@ void Parser::parse()
     file.close();
 }
 
-bool Parser::is_cout_expression(const std::string& line, int address)
+bool Parser::is_cout_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2)
 {
-    std::string op1 {};
-    std::string stream_out {};
-    std::string op2 {};
-
-    std::istringstream iss(line);
-    iss >> op1 >> stream_out >> op2; 
-    std::cout << "op1: " << op1 << ", stream_out: " << stream_out << ", op2: " << op2 << std::endl;
-
-    if (op1 == "std::cout" && stream_out == "<<" && (is_number(op2) || defined_variable(op2))) {
+    if (op1 == "std::cout" && assignment == "<<" && !op2.empty() && st1.empty() && st2.empty()) {
         return true;
+    } else if (op1 == "std::cout" && assignment != "<<" && !op2.empty() && st1.empty() && st2.empty()) {
+        throw std::runtime_error("Wrong operator: " + m_input);
     }
     return false;
 }
 
-template <typename T>
-T Parser::get_value(const std::string& name)
+bool Parser::is_cin_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2)
 {
-    if (is_int_variable(name)) {
-        return int_variables[name];
-    } else if (is_double_variable(name)) {
-        return double_variables[name];
-    } else if (is_bool_variable(name)) {
-        return bool_variables[name];
-    } else if (is_char_variable(name)) {
-        return char_variables[name];
+    if (op1 == "std::cin" && assignment == ">>" && !op2.empty() && st1.empty() && st2.empty()) {
+        return true;
+    } else if (op1 == "std::cin" && assignment != "<<" && !op2.empty() && st1.empty() && st2.empty()) {
+        throw std::runtime_error("Wrong operator: " + m_input);
+    }
+    return false;
+}
+
+void Parser::cin_expression_parse(std::string& expression)
+{
+    if (expression.back() != ';') {
+        throw std::runtime_error("You forgot the ; in the following line:");
+    }
+
+    expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
+
+    if (is_int_variable(expression)) {
+        //std::cout << "daaa" << std::endl;
+        int a {};
+        std::cin >> a;
+        int_variables[expression] = a;
+    } else if (is_char_variable(expression)) {
+        char c {};
+        std::cin >> c;
+        char_variables[expression] = c;
+    } else if (is_double_variable(expression)) {
+        double d {};
+        std::cin >> d;
+        double_variables[expression] = d;
+    } else if (is_float_variable(expression)) {
+        float f {};
+        std::cin >> f;
+        float_variables[expression] = f;
     } else {
-        throw std::runtime_error("Variable " + name + " is not defined.");
+        throw std::runtime_error("Variable " + expression + " is not defined.");
     }
 }
+
+void Parser::cout_expression_parse(std::string& expression)
+{
+    if (expression.back() != ';') {
+        throw std::runtime_error("You forgot the ; in the following line:");
+    }
+
+    expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
+
+    if (expression.front() == '\"' && expression.back() == '\"') {
+        expression.erase(0, 1);
+        expression.pop_back();
+        std::cout << expression << std::endl;
+    } else if (is_int_variable(expression)) {
+        std::cout << int_variables[expression] << std::endl;
+    } else if (is_bool_variable(expression)) {
+        std::cout << bool_variables[expression] << std::endl;
+    } else if (is_char_variable(expression)) {
+        std::cout << char_variables[expression] << std::endl;
+    } else if (is_double_variable(expression)) {
+        std::cout << double_variables[expression] << std::endl;
+    } else if (is_float_variable(expression)) {
+        std::cout << float_variables[expression] << std::endl;
+    } else {
+        throw std::runtime_error("Variable " + expression + " is not defined.");
+    }
+ }
