@@ -2,17 +2,31 @@
 
 int main() {
 
-    int x = 10;
-    int y = 12;
+  int a = 90;
+  int b = 31;
 
-    int b = 20;
+  if (a < b) {
 
-    std::cout << "hiiii";
+    if (a > b) {
 
-    std::cin >> b;
-    std::cout << b;
+    }
 
-    char d = 'b';
-    std::cout << d;
+  }
+
+  while (a < b) {
+    if (a > b) {
+
+    }
+
+  }
+
+  if (a > b) {
+    a += 90;
+  }
+
+  if (a > b) {
+
+
+  }
 
 }

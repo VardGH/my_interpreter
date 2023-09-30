@@ -193,6 +193,15 @@ void Parser::print_string_map()
     std::cout << std::endl;
 }
 
+void Parser::full_memory_print()
+{
+    std::cout << "full memory" << std::endl;
+    for(auto& elem : full_memory) {
+        std::cout << "Key: " << elem.first << " " << ", val: " << elem.second << std::endl;
+    }
+    std::cout << std::endl;
+}
+
 void Parser::parse_iostream(const std::string& line, bool& found_iostream)
 {
     if (is_iostream(line)) {
@@ -261,8 +270,11 @@ bool Parser::is_valid_line(const std::string& line, int address)
     if (is_cout_expression(op1, assignment, op2, st1, st2)) {
         cout_expression_parse(op2);
     } else if (is_cin_expression(op1, assignment, op2, st1, st2)) {
-        std::cout << "----" << std::endl;
         cin_expression_parse(op2);
+    } else if (is_increment_expression(op1, assignment, op2, st1, st2)) {
+        increment_expression_parse(assignment);
+    } else if (is_decrement_expression(op1, assignment, op2, st1, st2)) {
+        decrement_expression_parse(assignment);
     } else if (defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
         if (line[line.size() - 1] != ';') {
             throw std::runtime_error("You forgot the ; in the following line:" + address);
@@ -355,7 +367,14 @@ void Parser::parse_assignment_expression(const std::string& op1, const std::stri
         } else if (some_operator == "/") {
             float_variables[op1] = get_value<float>(op2) / get_value<float>(op3);
         }
-    }
+    } 
+    // else if (is_string_variable(op1)) {
+    //     std::cout << "////////" << std::endl;
+    //     if (some_operator == "+") {
+    //         std::cout << "////////" << std::endl;
+    //         string_variables[op1] = string_variables[op2] + string_variables[op3];
+    //     }
+    // }
 }
 
 void Parser::parse_variable_definition(const std::string& line, int address)
@@ -374,6 +393,10 @@ void Parser::parse_variable_definition(const std::string& line, int address)
         plus_assignment_operator_pars(op1, op2);
     } else if (assignment == "-=") {
         minus_assignment_operator_pars(op1, op2);
+    } else if (assignment == "*=") {
+        mul_assignment_operator_pars(op1, op2);
+    } else if (assignment == "/=") {
+        div_assignment_operator_pars(op1, op2);
     }
 }
 
@@ -447,6 +470,11 @@ void Parser::parse()
                 parse_expression(line, address);
             } 
 
+            if (is_if_expression(line)) {
+                // std::cout << "i am here" << std::endl;
+                parse_if_statement(line);
+            }
+
             ++address;
         }
     } catch (const std::exception& e) {
@@ -486,7 +514,6 @@ void Parser::cin_expression_parse(std::string& expression)
     expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
 
     if (is_int_variable(expression)) {
-        //std::cout << "daaa" << std::endl;
         int a {};
         std::cin >> a;
         int_variables[expression] = a;
@@ -529,7 +556,186 @@ void Parser::cout_expression_parse(std::string& expression)
         std::cout << double_variables[expression] << std::endl;
     } else if (is_float_variable(expression)) {
         std::cout << float_variables[expression] << std::endl;
+    } else if (is_string_variable(expression)) {
+        std::cout << string_variables[expression] << std::endl;
     } else {
         throw std::runtime_error("Variable " + expression + " is not defined.");
     }
  }
+
+ bool Parser::is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
+ {
+    if (op1 == "++" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        return true;
+    } else if (op1 == "++" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        throw std::runtime_error("Wrong increment_expression");
+    }
+    return false;
+ }
+
+ void Parser::increment_expression_parse(std::string& expression)
+{
+    if (expression.back() != ';') {
+        throw std::runtime_error("You forgot the ; in the following line:");
+    }
+
+    expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
+
+    if (is_int_variable(expression)) {
+        ++int_variables[expression];
+    } else if (is_bool_variable(expression)) {
+        std::cout << "lav ban ches anum" << std::endl;
+    } else if (is_char_variable(expression)) {
+        ++char_variables[expression];
+    } else if (is_double_variable(expression)) {
+        ++double_variables[expression];
+    } else if (is_float_variable(expression)) {
+        ++float_variables[expression];
+    } else {
+        throw std::runtime_error("Variable " + expression + " is not defined.");
+    }
+ }
+
+  bool Parser::is_decrement_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
+ {
+    if (op1 == "--" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        return true;
+    } else if (op1 == "--" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        throw std::runtime_error("Wrong decrement_expression");
+    }
+    return false;
+ }
+
+ void Parser::decrement_expression_parse(std::string& expression)
+{
+    if (expression.back() != ';') {
+        throw std::runtime_error("You forgot the ; in the following line:");
+    }
+
+    expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
+
+    if (is_int_variable(expression)) {
+        --int_variables[expression];
+    } else if (is_bool_variable(expression)) {
+        throw std::runtime_error("You can't use the -- operator directly on a bool");
+    } else if (is_char_variable(expression)) {
+        --char_variables[expression];
+    } else if (is_double_variable(expression)) {
+        --double_variables[expression];
+    } else if (is_float_variable(expression)) {
+        --float_variables[expression];
+    } else {
+        throw std::runtime_error("Variable " + expression + " is not defined.");
+    }
+ }
+
+ bool Parser::is_if_expression(const std::string& line)
+ {
+    return (line.find("if ") == 0);
+ }
+
+ void Parser::parse_if_statement(const std::string& line)
+ {
+    // Check if the line ends with an opening curly brace {
+    if (line.back() != '{') {
+        throw std::runtime_error("Missing opening curly brace {");
+    }
+
+    // Extract the condition part of the if statement
+    std::string condition = line.substr(3);
+    condition = condition.substr(0, condition.length() - 2);
+
+    // Check if the condition is enclosed in parentheses
+    if (condition.front() != '(' || condition.back() != ')') {
+        throw std::runtime_error("Condition must be enclosed in parentheses");
+    }
+
+    std::istringstream iss(condition);
+    std::string op1 {};
+    std::string op2 {};
+    std::string op3 {};
+    iss >> op1 >> op2 >> op3;
+
+    std::cout << op1 << std::endl;
+    std::cout << op2 << std::endl;
+    std::cout << op3 << std::endl;
+
+    if (op1.front() != '(') {
+        throw std::runtime_error("You miss (");
+    }
+    if (op3.back() != ')') {
+        throw std::runtime_error("You miss )");
+    }
+
+    op1 = op1.substr(1);
+    op3.pop_back();
+ }
+
+// read from file 
+void Parser::load_from_file(const std::string& filename) 
+{
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open file");
+    }
+
+    std::string line {};
+    int address = 0;
+    std::stack<int> if_starts;  // Stack if" statements
+    std::stack<int> while_starts;  // Stack "while" statements
+
+    while (std::getline(file, line)) {
+        ++address;
+        line = trim(line);
+
+        if (line.empty()) {
+            continue;
+        }
+
+        if (line.find("if ") == 0) {
+            std::cout << line << std::endl;
+            if_starts.push(address);
+        }
+
+        if (line.find("while ") == 0) {
+            std::cout << line << std::endl;
+            while_starts.push(address);
+        }
+
+        if (line == "}") {
+            if (!if_starts.empty()) {
+                int start_address = if_starts.top();
+                if_starts.pop();
+                if_map[start_address] = std::make_pair(start_address, address);
+            }
+
+            if (!while_starts.empty()) {
+                int start_address = while_starts.top();
+                while_starts.pop();
+                while_map[start_address] = std::make_pair(start_address, address);
+            }
+        }
+
+        full_memory[address] = line;
+    }
+
+    file.close();
+
+    // if_map
+    for (const auto& entry : if_map) {
+        int start_address = entry.second.first;
+        int end_address = entry.second.second;
+
+        std::cout << "If statement: Start Address = " << start_address
+                  << ", End Address = " << end_address << std::endl;
+    }
+
+    // while_map 
+    for (const auto& entry : while_map) {
+        int start_address = entry.second.first;
+        int end_address = entry.second.second;
+
+        std::cout << "While statement: Start Address = " << start_address
+                  << ", End Address = " << end_address << std::endl;
+    }
+}

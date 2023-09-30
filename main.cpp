@@ -19,6 +19,8 @@ int main(int argc, char **argv)
     }*/
 
     Parser parser("code.txt");
+    parser.load_from_file("code.txt");
+
     parser.parse();
 
     parser.print_int_map();
@@ -27,6 +29,7 @@ int main(int argc, char **argv)
     parser.print_char_map();
     parser.print_float_map();
     parser.print_string_map();
+    parser.full_memory_print();
 
     return 0;
 }

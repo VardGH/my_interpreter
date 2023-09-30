@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <stack>
 
 class Parser
 {
@@ -62,6 +63,8 @@ private:
     void assignment_operator_pars(const std::string& op1, const std::string& op2);
     void plus_assignment_operator_pars(const std::string& op1, const std::string& op2);
     void minus_assignment_operator_pars(const std::string& op1, const std::string& op2);
+    void mul_assignment_operator_pars(const std::string& op1, const std::string& op2);
+    void div_assignment_operator_pars(const std::string& op1, const std::string& op2);
     bool is_assignment_expression(const std::string& line, int address);
 
     // example x = y + z
@@ -76,6 +79,23 @@ private:
     bool is_cin_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2);
     void cin_expression_parse(std::string& expression);
 
+    // Functions for parsing increment expressions
+    bool is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5);
+    void increment_expression_parse(std::string& expression);
+
+    // Functions for parsing cin expressions
+    bool is_decrement_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5);
+    void decrement_expression_parse(std::string& expression);
+
+    // Functions for parsing "if" statements
+    bool is_if_expression(const std::string& line);
+    void parse_if_statement(const std::string& line);
+
+public:
+    // Read and store in map
+    void load_from_file(const std::string& filename);
+
+private:
     // Template function for retrieving variable values
     template <typename T>
     T get_value(const std::string& name)
@@ -106,6 +126,7 @@ public:
     void print_float_map();
     void print_double_map();
     void print_string_map();
+    void full_memory_print();
 
 private:
     std::string m_input;
@@ -115,6 +136,10 @@ private:
     std::unordered_map<std::string, float> float_variables;
     std::unordered_map<std::string, double> double_variables;
     std::unordered_map<std::string, std::string> string_variables;
+
+    std::unordered_map<int, std::string> full_memory;
+    std::unordered_map<int, std::pair<int, int>> if_map;
+    std::unordered_map<int, std::pair<int, int>> while_map;
 };
 
 #endif // PARSER_HPP_
