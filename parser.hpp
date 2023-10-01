@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <stack>
+#include <map>
 
 class Parser
 {
@@ -89,7 +90,8 @@ private:
 
     // Functions for parsing "if" statements
     bool is_if_expression(const std::string& line);
-    void parse_if_statement(const std::string& line);
+    void parse_if_statement(int& address, const std::string& line);
+    void execute_if_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3);
 
 public:
     // Read and store in map
@@ -137,7 +139,7 @@ private:
     std::unordered_map<std::string, double> double_variables;
     std::unordered_map<std::string, std::string> string_variables;
 
-    std::unordered_map<int, std::string> full_memory;
+    std::map<int, std::string> full_memory;
     std::unordered_map<int, std::pair<int, int>> if_map;
     std::unordered_map<int, std::pair<int, int>> while_map;
 };
