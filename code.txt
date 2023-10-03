@@ -2,20 +2,15 @@
 
 int main() {
 
-  int a = 90;
+  int a = 100;
   int b = 80;
 
-  double k = 1.3;
-  double c = 8.7;
-
-  while (c != k) {
-    std::cout << "in";
-    ++ k;
-    if (3 > 2) {
-      std::cout << "yes";
+  while (a != b) {
+    b += 5;
+    if (b == 90) {
+      continue;
     }
-    
+    std::cout << b;
   }
-  std::cout << "out";
 
 }

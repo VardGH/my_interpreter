@@ -2,6 +2,18 @@
 #include <iostream>
 #include <sstream>
 
+// Checks if the given code line represents an 'if' statement or expression
+bool Parser::is_if_expression(const std::string& line)
+{
+    return (line.find("if ") == 0);
+}
+
+// Checks if the given code line represents an 'while' statement or expression
+bool Parser::is_while_expression(const std::string& line)
+{
+    return (line.find("while ") == 0);
+}
+
 void Parser::parse_if_statement(int& address,  const std::string& line)
 {
     // Check if the line ends with an opening curly brace {

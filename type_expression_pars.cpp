@@ -1,5 +1,6 @@
 #include "parser.hpp"
 
+// Parses and stores boolean expressions
 void Parser::bool_expression_pars(const std::string& name, const std::string& expression)
 {
     bool tmp{};
@@ -25,6 +26,7 @@ void Parser::bool_expression_pars(const std::string& name, const std::string& ex
     }
 }
 
+// Parses and stores char expressions
 void Parser::char_expression_pars(const std::string& name, const std::string& expression)
 {
     char tmp{};
@@ -43,6 +45,7 @@ void Parser::char_expression_pars(const std::string& name, const std::string& ex
     char_variables[name] = tmp;
 }
 
+// Parses and stores int expressions
 void Parser::int_expression_pars(const std::string& name, const std::string& expression)
 {
     if (defined_variable(name)) {
@@ -70,6 +73,7 @@ void Parser::int_expression_pars(const std::string& name, const std::string& exp
     }
 }
 
+// Parses and stores float expressions
 void Parser::float_expression_pars(const std::string& name, const std::string& expression)
 {
     if (defined_variable(name)) {
@@ -97,6 +101,7 @@ void Parser::float_expression_pars(const std::string& name, const std::string& e
     }  
 }
 
+// Parses and stores double expressions
 void Parser::double_expression_pars(const std::string& name, const std::string& expression)
 {
     if (defined_variable(name)) {
@@ -124,6 +129,7 @@ void Parser::double_expression_pars(const std::string& name, const std::string& 
     }  
 }
 
+// Parses and stores string expressions
 void Parser::string_expression_pars(const std::string& name, const std::string& expression)
 {
     if (defined_variable(name)) {

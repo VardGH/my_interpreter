@@ -5,11 +5,13 @@
 #include <vector>
 #include <algorithm>
 
+// Ctor
 Parser::Parser(const std::string& input)
     : m_input{input}
 {
 }
 
+// Trimming whitespace
 std::string Parser::trim(const std::string& str) 
 {
     size_t first = str.find_first_not_of(" \t\r\n");
@@ -20,7 +22,7 @@ std::string Parser::trim(const std::string& str)
     return str.substr(first, last - first + 1);
 }
 
-
+// Checks if the given line of code represents a variable declaration
 bool Parser::is_variable_declaration(std::string& line, int address)
 {
     std::cout << line << std::endl;
@@ -41,36 +43,7 @@ bool Parser::is_variable_declaration(std::string& line, int address)
     return is_type;
 }
 
-void Parser::parse_variable_declaration(std::string& line, int address)
-{
-    line.erase(std::remove(line.begin(), line.end(), ';'), line.end());
-
-    std::istringstream iss(line);
-    std::string type {};
-    std::string name {};
-    std::string assignment {};
-    std::string expression {};
-
-    iss >> type >> name >> assignment >> expression;
-
-    std::cout << "type: " << type << std::endl;
-    std::cout << "name: " << name << std::endl;
-    std::cout << "assignment: " << assignment << std::endl;
-    std::cout << "expression: " << expression << std::endl;
-    std::cout << std::endl;
-
-    if (type != "" && name == "=") {
-        std::cout << "You forgot the name: " << address << std::endl;
-        return;
-    }
-
-    if (type != "" && name != "" && assignment == "=" && expression == "") {
-        std::cout << "You have not provided a value after = " << address << std::endl;
-        return;  
-    }
-    save_memory(type, name, expression);
-}
-
+// Saves a variable or expression to memory(maps)
 void Parser::save_memory(const std::string& type, const std::string& name, const std::string& expression)
 {
     std::string value {};
@@ -94,36 +67,43 @@ void Parser::save_memory(const std::string& type, const std::string& name, const
     }
 }
 
+// Checks if the given expression represents a boolean variable
 bool Parser::is_bool_variable(const std::string& expression)
 {
     return bool_variables.find(expression) != bool_variables.end();
 }
 
+// Checks if the given expression represents a char variable
 bool Parser::is_char_variable(const std::string& expression)
 {
     return char_variables.find(expression) != char_variables.end();
 }
 
+// Checks if the given expression represents an int variable
 bool Parser::is_int_variable(const std::string& expression)
 {
     return int_variables.find(expression) != int_variables.end();
 }
 
+// Checks if the given expression represents a float variable
 bool Parser::is_float_variable(const std::string& expression)
 {
     return float_variables.find(expression) != float_variables.end();
 }
 
+// Checks if the given expression represents a double variable
 bool Parser::is_double_variable(const std::string& expression)
 {
     return double_variables.find(expression) != double_variables.end();
 }
 
+// Checks if the given expression represents a string variable
 bool Parser::is_string_variable(const std::string& expression)
 {
     return string_variables.find(expression) != string_variables.end();
 }
 
+// Checks if the given expression represents a number(literal)
 bool Parser::is_number(const std::string& expression)
 {
     if (expression.empty()) {
@@ -139,24 +119,7 @@ bool Parser::is_number(const std::string& expression)
     return true; // All characters are digits
 }
 
-void Parser::parse_iostream(const std::string& line, bool& found_iostream)
-{
-    if (is_iostream(line)) {
-        found_iostream = true;
-    } else {
-        throw std::runtime_error("Missing #include <iostream>");
-    }
-}
-
-void Parser::parse_main(const std::string& line, int address, bool& found_main)
-{
-    if (is_main(line, address)) {
-        found_main = true;
-    } else {
-        throw std::runtime_error("Line does not contain int main() {");
-    }
-}
-
+// Checks if the given code line contains references to the iostream library
 bool Parser::is_iostream(const std::string& line)
 {
     std::string st1;
@@ -177,7 +140,8 @@ bool Parser::is_iostream(const std::string& line)
     return false;  // Not the correct directive
 }
 
-bool Parser::is_main(const std::string& line, int address)
+// Checks if the given code line contains the main function.
+bool Parser::is_main(const std::string& line)
 {
     std::string st1;
     std::string st2;
@@ -193,6 +157,7 @@ bool Parser::is_main(const std::string& line, int address)
     return false;
 }
 
+// Check lines
 bool Parser::is_valid_line(const std::string& line, int address)
 {
     std::string op1 {};
@@ -224,6 +189,7 @@ bool Parser::is_valid_line(const std::string& line, int address)
     return false;
 }
 
+// Check 
 bool Parser::is_assignment_expression(const std::string& line, int address)
 {
     std::string op1;
@@ -244,99 +210,7 @@ bool Parser::is_assignment_expression(const std::string& line, int address)
     return false;
 }
 
-// x = y + z
-void Parser::parse_expression(const std::string& line, int address)
-{
-    std::string op1;
-    std::string some_operator1;
-    std::string op2;
-    std::string some_operator2;
-    std::string op3;
-
-    std::istringstream iss(line);
-    iss >> op1 >> some_operator1 >> op2 >> some_operator2 >> op3;
-    op3.erase(std::remove(op3.begin(), op3.end(), ';'), op3.end());
-    
-    if (some_operator1 == "=") {
-        parse_assignment_expression(op1, op2, some_operator2, op3);
-    }
-}
-
-void Parser::parse_assignment_expression(const std::string& op1, const std::string& op2, const std::string& some_operator, const std::string& op3)
-{
-    if (is_int_variable(op1)) {
-        if (some_operator == "+") {
-            int_variables[op1] = get_value<int>(op2) + get_value<int>(op3);
-        } else if (some_operator == "-") {
-            int_variables[op1] = get_value<int>(op2) - get_value<int>(op3);
-        } else if (some_operator == "*") {
-            int_variables[op1] = get_value<int>(op2) * get_value<int>(op3);
-        } else if (some_operator == "/") {
-            int_variables[op1] = get_value<int>(op2) / get_value<int>(op3);
-        }
-    } else if (is_double_variable(op1)) {
-        if (some_operator == "+") {
-            double_variables[op1] = get_value<double>(op2) + get_value<double>(op3);
-        } else if (some_operator == "-") {
-            double_variables[op1] = get_value<double>(op2) - get_value<double>(op3);
-        } else if (some_operator == "*") {
-            double_variables[op1] = get_value<double>(op2) * get_value<double>(op3);
-        } else if (some_operator == "/") {
-            double_variables[op1] = get_value<double>(op2) / get_value<double>(op3);
-        }
-    } else if (is_char_variable(op1)) {
-        if (some_operator == "+") {
-            char_variables[op1] = get_value<char>(op2) + get_value<char>(op3);
-        } else if (some_operator == "-") {
-            char_variables[op1] = get_value<char>(op2) - get_value<char>(op3);
-        } else if (some_operator == "*") {
-            char_variables[op1] = get_value<char>(op2) * get_value<char>(op3);
-        } else if (some_operator == "/") {
-            char_variables[op1] = get_value<char>(op2) / get_value<char>(op3);
-        }
-    } else if (is_float_variable(op1)) {
-        if (some_operator == "+") {
-            float_variables[op1] = get_value<float>(op2) + get_value<float>(op3);
-        } else if (some_operator == "-") {
-            float_variables[op1] = get_value<float>(op2) - get_value<float>(op3);
-        } else if (some_operator == "*") {
-            float_variables[op1] = get_value<float>(op2) * get_value<float>(op3);
-        } else if (some_operator == "/") {
-            float_variables[op1] = get_value<float>(op2) / get_value<float>(op3);
-        }
-    } 
-    // else if (is_string_variable(op1)) {
-    //     std::cout << "////////" << std::endl;
-    //     if (some_operator == "+") {
-    //         std::cout << "////////" << std::endl;
-    //         string_variables[op1] = string_variables[op2] + string_variables[op3];
-    //     }
-    // }
-}
-
-void Parser::parse_variable_definition(const std::string& line, int address)
-{
-    std::string op1;
-    std::string assignment;
-    std::string op2;
-
-    std::istringstream iss(line);
-    iss >> op1 >> assignment >> op2; 
-    op2.erase(std::remove(op2.begin(), op2.end(), ';'), op2.end());
-
-    if (assignment == "=") {
-       assignment_operator_pars(op1, op2);
-    } else if (assignment == "+=") {
-        plus_assignment_operator_pars(op1, op2);
-    } else if (assignment == "-=") {
-        minus_assignment_operator_pars(op1, op2);
-    } else if (assignment == "*=") {
-        mul_assignment_operator_pars(op1, op2);
-    } else if (assignment == "/=") {
-        div_assignment_operator_pars(op1, op2);
-    }
-}
-
+// // Checks if the given expression represents a double literal
 bool Parser::is_double_literal(const std::string& expression)
 {
     try {
@@ -350,22 +224,47 @@ bool Parser::is_double_literal(const std::string& expression)
     }
 }
 
+// Checks if the given variable name is defined
 bool Parser::defined_variable(const std::string& name)
 {
     return (is_bool_variable(name) || is_char_variable(name) || is_int_variable(name) || is_float_variable(name) || is_double_variable(name) || is_string_variable(name));
 }
 
+// Checks if the given expression represents a character literal
 bool Parser::is_char_literal(const std::string& expression)
 {
     return (expression.size() == 3 && expression.front() == '\'' && expression.back() == '\'');
 }
 
+// Checks if the given code line represents increment expression
+bool Parser::is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
+{
+    if (op1 == "++" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        return true;
+    } else if (op1 == "++" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        throw std::runtime_error("Wrong increment_expression");
+    }
+    return false;
+}
+
+// Checks if the given code line represents decrement expression
+bool Parser::is_decrement_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
+{
+    if (op1 == "--" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        return true;
+    } else if (op1 == "--" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
+        throw std::runtime_error("Wrong decrement_expression");
+    }
+    return false;
+}
+
+// main parse function
 void Parser::parse()
 {
     int address = 1;
     bool found_iostream = false;
     bool found_main = false;
-    bool flag = false;
+    bool flag = false; // for the while condition
     std::pair<int, int> while_range;
 
     try {
@@ -388,7 +287,7 @@ void Parser::parse()
             }
 
             if (!found_main && found_iostream) {
-                parse_main(trimmed_line, address, found_main);
+                parse_main(trimmed_line, found_main);
                 ++address;
                 continue;
             }
@@ -415,11 +314,16 @@ void Parser::parse()
             }
 
             if (flag && address == while_range.second) {
-                std::cout << "falg if" << std::endl;
                 address  = while_range.first - 1;
             }
 
-            std::cout << "address: " << address << std::endl;
+            if (trimmed_line == "break;") {
+                address = while_range.second + 1;
+            }
+
+            if (trimmed_line == "continue;") {
+                address = while_range.first - 1;
+            }
     
             ++address;
         }
@@ -427,80 +331,4 @@ void Parser::parse()
         std::cerr << address << "-> Error: " << e.what() << std::endl;
         exit(0);
     }
-}
-
-bool Parser::is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
-{
-    if (op1 == "++" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
-        return true;
-    } else if (op1 == "++" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
-        throw std::runtime_error("Wrong increment_expression");
-    }
-    return false;
-}
-
-void Parser::increment_expression_parse(std::string& expression)
-{
-    if (expression.back() != ';') {
-        throw std::runtime_error("You forgot the ; in the following line:");
-    }
-
-    expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
-
-    if (is_int_variable(expression)) {
-        ++int_variables[expression];
-    } else if (is_bool_variable(expression)) {
-        std::cout << "!" << std::endl;
-    } else if (is_char_variable(expression)) {
-        ++char_variables[expression];
-    } else if (is_double_variable(expression)) {
-        ++double_variables[expression];
-    } else if (is_float_variable(expression)) {
-        ++float_variables[expression];
-    } else {
-        throw std::runtime_error("Variable " + expression + " is not defined.");
-    }
-}
-
-bool Parser::is_decrement_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
-{
-    if (op1 == "--" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
-        return true;
-    } else if (op1 == "--" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
-        throw std::runtime_error("Wrong decrement_expression");
-    }
-    return false;
-}
-
-void Parser::decrement_expression_parse(std::string& expression)
-{
-    if (expression.back() != ';') {
-        throw std::runtime_error("You forgot the ; in the following line:");
-    }
-
-    expression.erase(std::remove(expression.begin(), expression.end(), ';'), expression.end());
-
-    if (is_int_variable(expression)) {
-        --int_variables[expression];
-    } else if (is_bool_variable(expression)) {
-        throw std::runtime_error("You can't use the -- operator directly on a bool");
-    } else if (is_char_variable(expression)) {
-        --char_variables[expression];
-    } else if (is_double_variable(expression)) {
-        --double_variables[expression];
-    } else if (is_float_variable(expression)) {
-        --float_variables[expression];
-    } else {
-        throw std::runtime_error("Variable " + expression + " is not defined.");
-    }
-}
-
-bool Parser::is_if_expression(const std::string& line)
-{
-    return (line.find("if ") == 0);
-}
-
-bool Parser::is_while_expression(const std::string& line)
-{
-    return (line.find("while ") == 0);
 }

@@ -29,13 +29,13 @@ private:
     bool is_valid_line(const std::string& line, int address);
 
     bool is_iostream(const std::string& line);
-    bool is_main(const std::string& line, int address);
+    bool is_main(const std::string& line);
     
     // Functions for parsing specific line types
     void parse_variable_declaration(std::string& line, int address); // int x = 10;
     void parse_variable_definition(const std::string& line, int address); // x = y or x += 10
     void save_memory(const std::string& type, const std::string& type_name, const std::string& expression);
-    void parse_main(const std::string& line, int address, bool& found_main);
+    void parse_main(const std::string& line, bool& found_main);
     void parse_iostream(const std::string& line, bool& found_iostream);
 
     // Functions for parsing expressions of different data types
@@ -62,11 +62,11 @@ private:
     bool is_number(const std::string& expression);
 
     // Functions for parsing assignment expressions
-    void assignment_operator_pars(const std::string& op1, const std::string& op2);
-    void plus_assignment_operator_pars(const std::string& op1, const std::string& op2);
-    void minus_assignment_operator_pars(const std::string& op1, const std::string& op2);
-    void mul_assignment_operator_pars(const std::string& op1, const std::string& op2);
-    void div_assignment_operator_pars(const std::string& op1, const std::string& op2);
+    void assignment_operator_parse(const std::string& op1, const std::string& op2);
+    void plus_assignment_operator_parse(const std::string& op1, const std::string& op2);
+    void minus_assignment_operator_parse(const std::string& op1, const std::string& op2);
+    void mul_assignment_operator_parse(const std::string& op1, const std::string& op2);
+    void div_assignment_operator_parse(const std::string& op1, const std::string& op2);
     bool is_assignment_expression(const std::string& line, int address);
 
     // example x = y + z
@@ -94,6 +94,7 @@ private:
     void parse_if_statement(int& address, const std::string& line);
     void execute_if_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3);
 
+    // Functions for parsing "while" statements
     bool is_while_expression(const std::string& line);
     std::tuple<std::string, std::string, std::string> parse_while_statement(const std::string& line);
     std::pair<int, int> execute_while_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3, bool& flag);

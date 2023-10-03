@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
+// Checks if the given expression is a valid std::cout expression
 bool Parser::is_cout_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2)
 {
     if (op1 == "std::cout" && assignment == "<<" && !op2.empty() && st1.empty() && st2.empty()) {
@@ -12,6 +13,7 @@ bool Parser::is_cout_expression(const std::string& op1, const std::string& assig
     return false;
 }
 
+// Checks if the given expression is a valid std::cin expression
 bool Parser::is_cin_expression(const std::string& op1, const std::string& assignment, const std::string& op2, const std::string& st1, const std::string& st2)
 {
     if (op1 == "std::cin" && assignment == ">>" && !op2.empty() && st1.empty() && st2.empty()) {
@@ -22,6 +24,7 @@ bool Parser::is_cin_expression(const std::string& op1, const std::string& assign
     return false;
 }
 
+// Parses and handles std::cin expressions
 void Parser::cin_expression_parse(std::string& expression)
 {
     if (expression.back() != ';') {
@@ -51,6 +54,7 @@ void Parser::cin_expression_parse(std::string& expression)
     }
 }
 
+// Parses and handles std::cout expressions
 void Parser::cout_expression_parse(std::string& expression)
 {
     if (expression.back() != ';') {

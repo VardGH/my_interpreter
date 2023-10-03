@@ -14,6 +14,9 @@ void Parser::load_from_file(const std::string& filename)
     std::stack<int> if_starts;  // Stack for "if" statements
     std::stack<int> while_starts;  // Stack for "while" statements
 
+    int brace_count = 1;
+
+
     while (std::getline(file, line)) {
         ++address;
         line = trim(line);
@@ -21,15 +24,18 @@ void Parser::load_from_file(const std::string& filename)
         // Check for "if" statements
         if (line.find("if ") == 0) {
             if_starts.push(address);
+            ++brace_count;
         }
 
         // Check for "while" statements
         if (line.find("while ") == 0) {
             while_starts.push(address);
+            ++brace_count;
         }
 
         // Process closing curly braces
         if (line == "}") {
+            --brace_count;
             if (!if_starts.empty() && !while_starts.empty()) {
                 // if or while closing brace 
                 int if_top = if_starts.top();
@@ -60,23 +66,27 @@ void Parser::load_from_file(const std::string& filename)
 
     file.close();
 
-    // Print the if_map for verification
-    for (const auto& entry : if_map) {
-        int if_id = entry.first;
-        int start_address = entry.second.first;
-        int end_address = entry.second.second;
-
-        std::cout << "If statement " << if_id << ": Start Address = " << start_address
-                  << ", End Address = " << end_address << std::endl;
+    if (brace_count) {
+        throw std::runtime_error("you missed or overused { or }");
     }
 
-    // Print the while_map for verification
-    for (const auto& entry : while_map) {
-        int while_id = entry.first;
-        int start_address = entry.second.first;
-        int end_address = entry.second.second;
+    // // Print the if_map for verification
+    // for (const auto& entry : if_map) {
+    //     int if_id = entry.first;
+    //     int start_address = entry.second.first;
+    //     int end_address = entry.second.second;
 
-        std::cout << "While statement " << while_id << ": Start Address = " << start_address
-                  << ", End Address = " << end_address << std::endl;
-    }
+    //     std::cout << "If statement " << if_id << ": Start Address = " << start_address
+    //               << ", End Address = " << end_address << std::endl;
+    // }
+
+    // // Print the while_map for verification
+    // for (const auto& entry : while_map) {
+    //     int while_id = entry.first;
+    //     int start_address = entry.second.first;
+    //     int end_address = entry.second.second;
+
+    //     std::cout << "While statement " << while_id << ": Start Address = " << start_address
+    //               << ", End Address = " << end_address << std::endl;
+    // }
 }

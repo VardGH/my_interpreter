@@ -1,6 +1,7 @@
 #include "parser.hpp"
 
-void Parser::plus_assignment_operator_pars(const std::string& op1, const std::string& op2)
+// parse operator+= 
+void Parser::plus_assignment_operator_parse(const std::string& op1, const std::string& op2)
 {
     if (is_int_variable(op1)) {
         int_variables[op1] += get_value<int>(op2);
@@ -17,7 +18,8 @@ void Parser::plus_assignment_operator_pars(const std::string& op1, const std::st
     }
 }
 
-void Parser::minus_assignment_operator_pars(const std::string& op1, const std::string& op2)
+// parse operator-= 
+void Parser::minus_assignment_operator_parse(const std::string& op1, const std::string& op2)
 {
     if (is_int_variable(op1)) {
         int_variables[op1] -= get_value<int>(op2);
@@ -34,7 +36,8 @@ void Parser::minus_assignment_operator_pars(const std::string& op1, const std::s
     }
 }
 
-void Parser::assignment_operator_pars(const std::string& op1, const std::string& op2)
+// parse operator=
+void Parser::assignment_operator_parse(const std::string& op1, const std::string& op2)
 {
     if (is_int_variable(op1)) {
         int_variables[op1] = get_value<int>(op2);
@@ -61,7 +64,8 @@ void Parser::assignment_operator_pars(const std::string& op1, const std::string&
     }
 }
 
-void Parser::mul_assignment_operator_pars(const std::string& op1, const std::string& op2)
+// parse operator *= 
+void Parser::mul_assignment_operator_parse(const std::string& op1, const std::string& op2)
 {
     if (is_int_variable(op1)) {
         int_variables[op1] *= get_value<int>(op2);
@@ -78,7 +82,8 @@ void Parser::mul_assignment_operator_pars(const std::string& op1, const std::str
     }
 }
 
-void Parser::div_assignment_operator_pars(const std::string& op1, const std::string& op2)
+// parse operator /= 
+void Parser::div_assignment_operator_parse(const std::string& op1, const std::string& op2)
 {
     if (is_int_variable(op1)) {
         int_variables[op1] /= get_value<int>(op2);
