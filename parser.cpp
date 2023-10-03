@@ -429,17 +429,17 @@ void Parser::parse()
     }
 }
 
- bool Parser::is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
- {
+bool Parser::is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
+{
     if (op1 == "++" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
         return true;
     } else if (op1 == "++" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
         throw std::runtime_error("Wrong increment_expression");
     }
     return false;
- }
+}
 
- void Parser::increment_expression_parse(std::string& expression)
+void Parser::increment_expression_parse(std::string& expression)
 {
     if (expression.back() != ';') {
         throw std::runtime_error("You forgot the ; in the following line:");
@@ -460,19 +460,19 @@ void Parser::parse()
     } else {
         throw std::runtime_error("Variable " + expression + " is not defined.");
     }
- }
+}
 
-  bool Parser::is_decrement_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
- {
+bool Parser::is_decrement_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
+{
     if (op1 == "--" && !op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
         return true;
     } else if (op1 == "--" && op2.empty() && op3.empty() && op4.empty() && op5.empty()) {
         throw std::runtime_error("Wrong decrement_expression");
     }
     return false;
- }
+}
 
- void Parser::decrement_expression_parse(std::string& expression)
+void Parser::decrement_expression_parse(std::string& expression)
 {
     if (expression.back() != ';') {
         throw std::runtime_error("You forgot the ; in the following line:");
@@ -493,82 +493,14 @@ void Parser::parse()
     } else {
         throw std::runtime_error("Variable " + expression + " is not defined.");
     }
- }
+}
 
- bool Parser::is_if_expression(const std::string& line)
- {
-    return (line.find("if ") == 0);
- }
-
- bool Parser::is_while_expression(const std::string& line)
- {
-    return (line.find("while ") == 0);
- }
-
-// read from file 
-void Parser::load_from_file(const std::string& filename)
+bool Parser::is_if_expression(const std::string& line)
 {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file");
-    }
+    return (line.find("if ") == 0);
+}
 
-    std::string line {};
-    int address = 0;
-    std::stack<int> if_starts;  // Stack for "if" statements
-    std::stack<int> while_starts;  // Stack for "while" statements
-
-    while (std::getline(file, line)) {
-        ++address;
-        line = trim(line);
-
-        // Check for "if" statements
-        if (line.find("if ") == 0) {
-            if_starts.push(address);
-        }
-
-        // Check for "while" statements
-        if (line.find("while ") == 0) {
-            while_starts.push(address);
-        }
-
-        // Process closing curly braces
-        if (line == "}") {
-            if (!if_starts.empty()) {
-                int start_address = if_starts.top();
-                if_starts.pop();
-                if_map[start_address] = std::make_pair(start_address, address);
-            }
-
-            if (!while_starts.empty()) {
-                int start_address = while_starts.top();
-                while_starts.pop();
-                while_map[start_address] = std::make_pair(start_address, address);
-            }
-        }
-
-        full_memory[address] = line;
-    }
-
-    file.close();
-
-    // Print the if_map for verification
-    for (const auto& entry : if_map) {
-        int if_id = entry.first;
-        int start_address = entry.second.first;
-        int end_address = entry.second.second;
-
-        std::cout << "If statement " << if_id << ": Start Address = " << start_address
-                  << ", End Address = " << end_address << std::endl;
-    }
-
-    // Print the while_map for verification
-    for (const auto& entry : while_map) {
-        int while_id = entry.first;
-        int start_address = entry.second.first;
-        int end_address = entry.second.second;
-
-        std::cout << "While statement " << while_id << ": Start Address = " << start_address
-                  << ", End Address = " << end_address << std::endl;
-    }
+bool Parser::is_while_expression(const std::string& line)
+{
+    return (line.find("while ") == 0);
 }

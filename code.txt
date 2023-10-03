@@ -3,11 +3,18 @@
 int main() {
 
   int a = 90;
-  int b = 70;
+  int b = 80;
 
-  while (a > b) {
+  double k = 1.3;
+  double c = 8.7;
+
+  while (c != k) {
     std::cout << "in";
-    b += 5;
+    ++ k;
+    if (3 > 2) {
+      std::cout << "yes";
+    }
+    
   }
   std::cout << "out";
 
