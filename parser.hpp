@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <stack>
 #include <map>
+#include<tuple>
 
 class Parser
 {
@@ -92,6 +93,10 @@ private:
     bool is_if_expression(const std::string& line);
     void parse_if_statement(int& address, const std::string& line);
     void execute_if_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3);
+
+    bool is_while_expression(const std::string& line);
+    std::tuple<std::string, std::string, std::string> parse_while_statement(const std::string& line);
+    std::pair<int, int> execute_while_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3, bool& flag);
 
 public:
     // Read and store in map

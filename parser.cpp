@@ -365,6 +365,8 @@ void Parser::parse()
     int address = 1;
     bool found_iostream = false;
     bool found_main = false;
+    bool flag = false;
+    std::pair<int, int> while_range;
 
     try {
         while (address < full_memory.size()) {
@@ -406,6 +408,17 @@ void Parser::parse()
             if (is_if_expression(trimmed_line)) {
                 parse_if_statement(address, trimmed_line);
             }
+
+            if (is_while_expression(trimmed_line)) {
+                std::tuple<std::string, std::string, std::string> operands = parse_while_statement(trimmed_line);
+                while_range = execute_while_statement(address, std::get<0>(operands), std::get<1>(operands), std::get<2>(operands), flag);
+            }
+
+            if (flag && address == while_range.second) {
+                std::cout << "falg if" << std::endl;
+                address  = while_range.first - 1;
+            }
+
             std::cout << "address: " << address << std::endl;
     
             ++address;
@@ -415,7 +428,6 @@ void Parser::parse()
         exit(0);
     }
 }
-
 
  bool Parser::is_increment_expression(const std::string& op1, const std::string& op2, const std::string& op3, const std::string& op4, const std::string& op5)
  {
@@ -438,7 +450,7 @@ void Parser::parse()
     if (is_int_variable(expression)) {
         ++int_variables[expression];
     } else if (is_bool_variable(expression)) {
-        std::cout << "lav ban ches anum" << std::endl;
+        std::cout << "!" << std::endl;
     } else if (is_char_variable(expression)) {
         ++char_variables[expression];
     } else if (is_double_variable(expression)) {
@@ -486,6 +498,11 @@ void Parser::parse()
  bool Parser::is_if_expression(const std::string& line)
  {
     return (line.find("if ") == 0);
+ }
+
+ bool Parser::is_while_expression(const std::string& line)
+ {
+    return (line.find("while ") == 0);
  }
 
 // read from file 
