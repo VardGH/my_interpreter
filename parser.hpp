@@ -5,7 +5,8 @@
 #include <unordered_map>
 #include <stack>
 #include <map>
-#include<tuple>
+#include <tuple>
+#include <vector>
 
 class Parser
 {
@@ -99,6 +100,21 @@ private:
     std::tuple<std::string, std::string, std::string> parse_while_statement(const std::string& line);
     std::pair<int, int> execute_while_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3, bool& flag);
 
+    // function for arrary parse
+    bool is_array_declaration(const std::string& line);
+
+    bool is_array_manipulation(const std::string& line);
+    void parse_array_manipulation(const std::string& line);
+    void extract_array_components(const std::string& arr_string, std::string& name, std::string& index); 
+    void execute_array_assignment_statement(const std::string& array_name, const std::string& index, const std::string& assignment, const std::string& value);
+
+    void parse_array_statement(const std::string& line);
+    bool is_int_array(const std::string& expression);
+    bool defined_array(const std::string& name);
+
+public: 
+    void print_int_arrays();
+
 public:
     // Read and store in map
     void load_from_file(const std::string& filename);
@@ -148,6 +164,9 @@ private:
     std::map<int, std::string> full_memory;
     std::unordered_map<int, std::pair<int, int>> if_map;
     std::unordered_map<int, std::pair<int, int>> while_map;
+
+    std::map<std::string, std::vector<int>> int_array;
+
 };
 
 #endif // PARSER_HPP_

@@ -25,6 +25,7 @@ std::string Parser::trim(const std::string& str)
 // Checks if the given line of code represents a variable declaration
 bool Parser::is_variable_declaration(std::string& line, int address)
 {
+    //std::cout << "declaration" << std::endl;
     std::cout << line << std::endl;
     // Check if the line starts with one of the data types
     const std::vector<std::string> data_types = {"char", "bool", "int", "float", "double", "string"};
@@ -33,12 +34,19 @@ bool Parser::is_variable_declaration(std::string& line, int address)
     for (const std::string& data_type : data_types) {
         if (line.find(data_type) == 0) {
             is_type = true;
+
+            size_t pos1 = line.find('[');
+            size_t pos2 = line.find(']');
+
+            if (pos1 != std::string::npos || pos2 != std::string::npos) {
+                is_type = false;
+            }
         }
     }
 
     // Check if the line ends with a semicolon
     if (is_type && line[line.size() - 1] != ';') {
-        throw std::runtime_error("You forgot the ; in the following line:" + address);
+        throw std::runtime_error("You forgot the ; in the following linee:" + address);
     }
     return is_type;
 }
@@ -179,11 +187,10 @@ bool Parser::is_valid_line(const std::string& line, int address)
         decrement_expression_parse(assignment);
     } else if (defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
         if (line[line.size() - 1] != ';') {
-            throw std::runtime_error("You forgot the ; in the following line:" + address);
+            throw std::runtime_error("You forgot the ; in the following linel:" + address);
         }
         return true;
-    } 
-    else if (!defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
+    } else if (!defined_variable(op1) && !assignment.empty() && !op2.empty() && st1.empty() && st2.empty()) {
         throw std::runtime_error("Not declare variable " + op1);
     }
     return false;
@@ -230,6 +237,18 @@ bool Parser::defined_variable(const std::string& name)
     return (is_bool_variable(name) || is_char_variable(name) || is_int_variable(name) || is_float_variable(name) || is_double_variable(name) || is_string_variable(name));
 }
 
+// Checks if the given variable name is defined array
+bool Parser::defined_array(const std::string& name)
+{
+    return is_int_array(name);
+}
+
+// Checks if the given expression represents an int array
+bool Parser::is_int_array(const std::string& expression)
+{
+    return int_array.find(expression) != int_array.end();
+}
+
 // Checks if the given expression represents a character literal
 bool Parser::is_char_literal(const std::string& expression)
 {
@@ -256,6 +275,128 @@ bool Parser::is_decrement_expression(const std::string& op1, const std::string& 
         throw std::runtime_error("Wrong decrement_expression");
     }
     return false;
+}
+
+bool Parser::is_array_manipulation(const std::string& line)
+{
+    size_t pos1 = line.find('[');
+    size_t pos2 = line.find(']');
+
+    if (pos1 == std::string::npos || pos2 == std::string::npos) {
+        return false;
+    }
+    return true;
+}
+
+void Parser::extract_array_components(const std::string& arr_string, std::string& name, std::string& index) 
+{
+    size_t start = arr_string.find('[');
+    size_t end = arr_string.find(']');
+
+    if (start != std::string::npos && end != std::string::npos) {
+        name = arr_string.substr(0, start);
+        index = arr_string.substr(start + 1, end - start - 1);
+    }
+}
+
+void Parser::parse_array_manipulation(const std::string& line) 
+{
+    std::string tmp_name_arr {};
+    std::string index {};
+    std::string assignment {};
+    std::string value {};
+
+    std::istringstream iss(line);
+
+    iss >> tmp_name_arr >> assignment >> value;
+
+    // Extract array components
+    std::string array_name;
+    extract_array_components(tmp_name_arr, array_name, index);
+
+    std::cout << "array_name: " << array_name << std::endl;
+    std::cout << "index: " << index << std::endl;
+
+    execute_array_assignment_statement(array_name, index, assignment, value);
+}
+
+void Parser::execute_array_assignment_statement(const std::string& array_name, const std::string& index, const std::string& assignment, const std::string& value)
+{
+    if (!defined_array(array_name)) {
+        throw std::runtime_error("Not defined array: " + array_name);
+    }
+
+    // Convert index to size_t
+    int array_index = get_value<int>(index);
+    
+    if (is_int_array(array_name)) {
+        int_array[array_name][array_index] = get_value<int>(value);
+    }
+}
+
+bool Parser::is_array_declaration(const std::string& line)
+{
+    //std::cout << "array" << std::endl;
+    std::cout << line << std::endl;
+    // Check if the line starts with one of the data types
+    const std::vector<std::string> data_types = {"char", "bool", "int", "float", "double", "string"};
+
+    int is_type = false;
+    for (const std::string& data_type : data_types) {
+        if (line.find(data_type) == 0) {
+            is_type = true;
+
+            size_t pos1 = line.find('[');
+            size_t pos2 = line.find(']');
+
+            if (pos1 == std::string::npos || pos2 == std::string::npos) {
+                is_type = false;
+            }
+        }
+    }
+
+    // Check if the line ends with a semicolon
+    if (is_type && line[line.size() - 1] != ';') {
+        std::cout << "i am here" << std::endl;
+        throw std::runtime_error("You forgot the ; in the following line:");
+    }
+    return is_type;
+}
+
+void Parser::parse_array_statement(const std::string& line)
+{
+    std::string op1 {};
+    std::string op2 {};
+    std::string op3 {};
+
+    std::istringstream iss(line);
+    iss >> op1 >> op2 >> op3;
+
+    op3.erase(std::remove(op3.begin(), op3.end(), ';'), op3.end());
+
+    std::cout << "op1: " << op1 << std::endl;
+    std::cout << "op2: " << op2 << std::endl;
+    std::cout << "op3: " << op3 << std::endl;
+
+    if (defined_array(op2) || defined_variable(op2)) {
+        throw std::runtime_error("Redefinition");
+    }
+
+    op3 = op3.substr(1);
+    op3.pop_back();
+
+    int size_array;
+
+    if (is_number(op3) || is_int_variable(op3)) {
+        size_array = get_value<int>(op3);
+    }
+
+    if (size_array < 0) {
+        throw std::runtime_error("Array size cannot be negative");
+    }
+
+    // Initialize the integer array with zeros
+    int_array[op2] = std::vector<int>(size_array, 0);
 }
 
 // main parse function
@@ -294,6 +435,22 @@ void Parser::parse()
 
             if (is_variable_declaration(trimmed_line, address)) {
                 parse_variable_declaration(trimmed_line, address);
+                // ++address;
+                // continue;
+            }
+
+            if (is_array_declaration(trimmed_line)) {
+                std::cout << "daa" << std::endl;
+                parse_array_statement(trimmed_line);
+                ++address;
+                continue;
+            }
+
+            if (is_array_manipulation(trimmed_line)) {
+                std::cout << "manipulation" << std::endl;
+                parse_array_manipulation(trimmed_line);
+                ++address;
+                continue;
             }
 
             if (is_valid_line(trimmed_line, address)) {

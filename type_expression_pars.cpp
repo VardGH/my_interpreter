@@ -39,7 +39,9 @@ void Parser::char_expression_pars(const std::string& name, const std::string& ex
         }
     } else if (expression.empty()) {
         tmp = ' ';
-    } else {
+    } else if (is_number(expression))
+        tmp = std::stoi(expression);
+    else {
         throw std::invalid_argument("Invalid char expression: " + expression);
     }
     char_variables[name] = tmp;

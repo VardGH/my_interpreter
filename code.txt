@@ -2,15 +2,17 @@
 
 int main() {
 
-  int a = 100;
-  int b = 80;
+  int n = 5;
 
-  while (a != b) {
-    b += 5;
-    if (b == 90) {
-      continue;
-    }
-    std::cout << b;
+  int arr [n];
+
+  int i = 0;
+  int j = n;
+
+  while (i < n) {
+    arr[i] = j
+    ++ i;
+    ++ j;
   }
 
 }

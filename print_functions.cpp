@@ -63,3 +63,25 @@ void Parser::full_memory_print()
     }
     std::cout << std::endl;
 }
+
+void Parser::print_int_arrays()
+{
+    for (const auto& entry : int_array) {
+        const std::string& array_name = entry.first;
+        const std::vector<int>& values = entry.second;
+
+        std::cout << "Array " << array_name << ": [";
+
+        if (!values.empty()) {
+            // Print elements separated by commas
+            for (int i = 0; i < values.size() - 1; ++i) {
+                std::cout << values[i] << ", ";
+            }
+
+            // Print the last element
+            std::cout << values.back();
+        }
+
+        std::cout << "]" << std::endl;
+    }
+}

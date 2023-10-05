@@ -31,5 +31,7 @@ int main(int argc, char **argv)
     parser.print_string_map();
     //parser.full_memory_print();
 
+    parser.print_int_arrays();
+
     return 0;
 }
