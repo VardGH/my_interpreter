@@ -23,15 +23,20 @@ int main(int argc, char **argv)
 
     parser.parse();
 
-    parser.print_int_map();
-    parser.print_bool_map();
-    parser.print_double_map();
-    parser.print_char_map();
-    parser.print_float_map();
-    parser.print_string_map();
+    // parser.print_int_map();
+    // parser.print_bool_map();
+    // parser.print_double_map();
+    // parser.print_char_map();
+    // parser.print_float_map();
+    // parser.print_string_map();
     //parser.full_memory_print();
 
-    parser.print_int_arrays();
+    // parser.print_int_arrays();
+    // parser.print_double_arrays();
+    // parser.print_char_arrays();
+    // parser.print_bool_arrays();
+    // parser.print_string_arrays();
+    // parser.print_float_arrays();
 
     return 0;
 }

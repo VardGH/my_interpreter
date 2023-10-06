@@ -70,7 +70,117 @@ void Parser::print_int_arrays()
         const std::string& array_name = entry.first;
         const std::vector<int>& values = entry.second;
 
-        std::cout << "Array " << array_name << ": [";
+        std::cout << "IArray " << array_name << ": [";
+
+        if (!values.empty()) {
+            // Print elements separated by commas
+            for (int i = 0; i < values.size() - 1; ++i) {
+                std::cout << values[i] << ", ";
+            }
+
+            // Print the last element
+            std::cout << values.back();
+        }
+
+        std::cout << "]" << std::endl;
+    }
+}
+
+void Parser::print_double_arrays()
+{
+    for (const auto& entry : double_array) {
+        const std::string& array_name = entry.first;
+        const std::vector<double>& values = entry.second;
+
+        std::cout << "DArray " << array_name << ": [";
+
+        if (!values.empty()) {
+            // Print elements separated by commas
+            for (int i = 0; i < values.size() - 1; ++i) {
+                std::cout << values[i] << ", ";
+            }
+
+            // Print the last element
+            std::cout << values.back();
+        }
+
+        std::cout << "]" << std::endl;
+    }
+}
+
+void Parser::print_char_arrays()
+{
+    for (const auto& entry : char_array) {
+        const std::string& array_name = entry.first;
+        const std::vector<char>& values = entry.second;
+
+        std::cout << "CArray " << array_name << ": [";
+
+        if (!values.empty()) {
+            // Print elements separated by commas
+            for (int i = 0; i < values.size() - 1; ++i) {
+                std::cout << values[i] << ", ";
+            }
+
+            // Print the last element
+            std::cout << values.back();
+        }
+
+        std::cout << "]" << std::endl;
+    }
+}
+
+void Parser::print_bool_arrays()
+{
+    for (const auto& entry : bool_array) {
+        const std::string& array_name = entry.first;
+        const std::vector<bool>& values = entry.second;
+
+        std::cout << "BArray " << array_name << ": [";
+
+        if (!values.empty()) {
+            // Print elements separated by commas
+            for (int i = 0; i < values.size() - 1; ++i) {
+                std::cout << values[i] << ", ";
+            }
+
+            // Print the last element
+            std::cout << values.back();
+        }
+
+        std::cout << "]" << std::endl;
+    }
+}
+
+void Parser::print_string_arrays()
+{
+    for (const auto& entry : string_array) {
+        const std::string& array_name = entry.first;
+        const std::vector<std::string>& values = entry.second;
+
+        std::cout << "SArray " << array_name << ": [";
+
+        if (!values.empty()) {
+            // Print elements separated by commas
+            for (int i = 0; i < values.size() - 1; ++i) {
+                std::cout << values[i] << ", ";
+            }
+
+            // Print the last element
+            std::cout << values.back();
+        }
+
+        std::cout << "]" << std::endl;
+    }
+}
+
+void Parser::print_float_arrays()
+{
+    for (const auto& entry : float_array) {
+        const std::string& array_name = entry.first;
+        const std::vector<float>& values = entry.second;
+
+        std::cout << "FArray " << array_name << ": [";
 
         if (!values.empty()) {
             // Print elements separated by commas

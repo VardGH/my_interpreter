@@ -37,18 +37,14 @@ void Parser::parse_if_statement(int& address,  const std::string& line)
     iss >> op1 >> op2 >> op3;
 
     if (op1.front() != '(') {
-        throw std::runtime_error("You miss (");
+        throw std::runtime_error("You forgot the (");
     }
     if (op3.back() != ')') {
-        throw std::runtime_error("You miss )");
+        throw std::runtime_error("You forgot the )");
     }
 
     op1 = op1.substr(1);
     op3.pop_back();
-
-    std::cout << "op1: " << op1 << std::endl;
-    std::cout << "op2: " << op2 << std::endl;
-    std::cout << "op3: " << op3 << std::endl;
 
     execute_if_statement(address, op1, op2, op3);
 }
@@ -84,11 +80,23 @@ ComparisonOperator get_comparison_operator(const std::string& op)
 
 void Parser::execute_if_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3)
 {
-    double tmp1 = get_value<double>(op1);
-    double tmp2 = get_value<double>(op3);
+    std::string arr1 {};
+    std::string index1 {};
+    if (is_array_manipulation(op1)) {
+        extract_array_components(op1, arr1, index1);
+    }
 
-    std::cout << "tmp1: " << tmp1 << std::endl;
-    std::cout << "tmp2: " << tmp2 << std::endl;
+    std::string arr2 {};
+    std::string index2 {};
+    if (is_array_manipulation(op3)) {
+        extract_array_components(op3, arr2, index2);
+    }
+
+    double tmp1 = is_array_manipulation(op1) ? get_arr_value<double>(arr1, index1) : get_value<double>(op1);
+    double tmp2 = is_array_manipulation(op3) ? get_arr_value<double>(arr2, index2) :  get_value<double>(op3);
+
+    // std::cout << "tmp1: " << tmp1 << std::endl;
+    // std::cout << "tmp2: " << tmp2 << std::endl;
 
     std::pair<int, int> address_range = if_map[address]; 
 
@@ -144,10 +152,10 @@ std::tuple<std::string, std::string, std::string> Parser::parse_while_statement(
     iss >> op1 >> op2 >> op3;
 
     if (op1.front() != '(') {
-        throw std::runtime_error("You miss (");
+        throw std::runtime_error("You forgot the (");
     }
     if (op3.back() != ')') {
-        throw std::runtime_error("You miss )");
+        throw std::runtime_error("You forgot the )");
     }
 
     op1 = op1.substr(1);
@@ -158,8 +166,20 @@ std::tuple<std::string, std::string, std::string> Parser::parse_while_statement(
 
 std::pair<int, int> Parser::execute_while_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3, bool& flag)
 {
-    double tmp1 = get_value<double>(op1);
-    double tmp2 = get_value<double>(op3);
+    std::string arr1 {};
+    std::string index1 {};
+    if (is_array_manipulation(op1)) {
+        extract_array_components(op1, arr1, index1);
+    }
+    
+    std::string arr2 {};
+    std::string index2 {};
+    if (is_array_manipulation(op3)) {
+        extract_array_components(op3, arr2, index2);
+    }
+
+    double tmp1 = is_array_manipulation(op1) ? get_arr_value<double>(arr1, index1) : get_value<double>(op1);
+    double tmp2 = is_array_manipulation(op3) ? get_arr_value<double>(arr2, index2) : get_value<double>(op3);
 
     std::pair<int, int> address_range = while_map[address]; 
 

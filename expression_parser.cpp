@@ -132,11 +132,11 @@ void Parser::parse_variable_declaration(std::string& line, int address)
     iss >> type >> name >> assignment >> expression;
 
     // will be deleted
-    std::cout << "type: " << type << std::endl;
-    std::cout << "name: " << name << std::endl;
-    std::cout << "assignment: " << assignment << std::endl;
-    std::cout << "expression: " << expression << std::endl;
-    std::cout << std::endl;
+    // std::cout << "type: " << type << std::endl;
+    // std::cout << "name: " << name << std::endl;
+    // std::cout << "assignment: " << assignment << std::endl;
+    // std::cout << "expression: " << expression << std::endl;
+    // std::cout << std::endl;
 
     if (type != "" && name == "=") {
         std::cout << "You forgot the name: " << address << std::endl;

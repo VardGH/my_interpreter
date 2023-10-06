@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+// read file 
 void Parser::load_from_file(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -71,22 +72,22 @@ void Parser::load_from_file(const std::string& filename)
     }
 
     // Print the if_map for verification
-    for (const auto& entry : if_map) {
-        int if_id = entry.first;
-        int start_address = entry.second.first;
-        int end_address = entry.second.second;
+    // for (const auto& entry : if_map) {
+    //     int if_id = entry.first;
+    //     int start_address = entry.second.first;
+    //     int end_address = entry.second.second;
 
-        std::cout << "If statement " << if_id << ": Start Address = " << start_address
-                  << ", End Address = " << end_address << std::endl;
-    }
+    //     std::cout << "If statement " << if_id << ": Start Address = " << start_address
+    //               << ", End Address = " << end_address << std::endl;
+    // }
 
-    // Print the while_map for verification
-    for (const auto& entry : while_map) {
-        int while_id = entry.first;
-        int start_address = entry.second.first;
-        int end_address = entry.second.second;
+    // // Print the while_map for verification
+    // for (const auto& entry : while_map) {
+    //     int while_id = entry.first;
+    //     int start_address = entry.second.first;
+    //     int end_address = entry.second.second;
 
-        std::cout << "While statement " << while_id << ": Start Address = " << start_address
-                  << ", End Address = " << end_address << std::endl;
-    }
+    //     std::cout << "While statement " << while_id << ": Start Address = " << start_address
+    //               << ", End Address = " << end_address << std::endl;
+    // }
 }

@@ -49,7 +49,47 @@ void Parser::cin_expression_parse(std::string& expression)
         float f {};
         std::cin >> f;
         float_variables[expression] = f;
-    } else {
+    }
+    else if (is_array_manipulation(expression)) {
+        //std::cout << "expression| " << std::endl;
+        std::string array_name {};
+        std::string index {};
+        extract_array_components(expression, array_name, index);
+
+        int id = get_value<int>(index);
+        if (is_int_array(array_name)) {
+            int i {};
+            std::cin >> i;
+            const auto array = int_array[array_name];
+            int_array[array_name][id] = i;
+        } else if (is_double_array(array_name)) {
+            double i {};
+            std::cin >> i;
+            const auto array = double_array[array_name];
+            double_array[array_name][id] = i;
+        } else if (is_char_array(array_name)) {
+            char i {};
+            std::cin >> i;
+            const auto array = char_array[array_name];
+            char_array[array_name][id] = i;
+        } else if (is_bool_array(array_name)) {
+            bool i {};
+            std::cin >> i;
+            const auto array = bool_array[array_name];
+            bool_array[array_name][id] = i;
+        } else if (is_string_array(array_name)) {
+            std::string i {};
+            std::cin >> i;
+            const auto array = string_array[array_name];
+            string_array[array_name][id] = i;
+        } else if (is_float_array(array_name)) {
+            float i {};
+            std::cin >> i;
+            const auto array = float_array[array_name];
+            float_array[array_name][id] = i;
+        }
+    } 
+    else {
         throw std::runtime_error("Variable " + expression + " is not defined.");
     }
 }
@@ -79,7 +119,30 @@ void Parser::cout_expression_parse(std::string& expression)
         std::cout << float_variables[expression] << std::endl;
     } else if (is_string_variable(expression)) {
         std::cout << string_variables[expression] << std::endl;
-    } else {
+    } else if (is_array_manipulation(expression)) {
+        std::string array_name {};
+        std::string index {};
+        extract_array_components(expression, array_name, index);
+
+        int id = get_value<int>(index);
+        if (is_int_array(array_name)) {
+            const auto array = int_array[array_name];
+            std::cout << array[id] << std::endl;
+        } else if (is_double_array(array_name)) {
+            const auto array = double_array[array_name];
+            std::cout << array[id] << std::endl;
+        } else if (is_char_array(array_name)) {
+            const auto array = char_array[array_name];
+            std::cout << array[id] << std::endl;
+        } else if (is_bool_array(array_name)) {
+            const auto array = bool_array[array_name];
+            std::cout << array[id] << std::endl;
+        } else if (is_string_array(array_name)) {
+            const auto array = string_array[array_name];
+            std::cout << array[id] << std::endl;
+        }
+    } 
+    else {
         throw std::runtime_error("Variable " + expression + " is not defined.");
     }
  }

@@ -61,6 +61,11 @@ private:
     bool is_double_literal(const std::string& expression);
     bool is_char_literal(const std::string& expression);
     bool is_number(const std::string& expression);
+    bool is_bool_literal(const std::string& expression);
+    bool is_string_literal(const std::string& expression);
+
+    // get string
+    std::string get_string(const std::string& expression);
 
     // Functions for parsing assignment expressions
     void assignment_operator_parse(const std::string& op1, const std::string& op2);
@@ -100,20 +105,40 @@ private:
     std::tuple<std::string, std::string, std::string> parse_while_statement(const std::string& line);
     std::pair<int, int> execute_while_statement(int& address, const std::string& op1, const std::string& op2, const std::string& op3, bool& flag);
 
-    // function for arrary parse
+    /*function for arrary parse*/
     bool is_array_declaration(const std::string& line);
-
+    void brace_init_array(const std::string& line);
     bool is_array_manipulation(const std::string& line);
+
+    // parse
     void parse_array_manipulation(const std::string& line);
+    void parse_array_statement(const std::string& line);
+
+    // execut 
     void extract_array_components(const std::string& arr_string, std::string& name, std::string& index); 
     void execute_array_assignment_statement(const std::string& array_name, const std::string& index, const std::string& assignment, const std::string& value);
-
-    void parse_array_statement(const std::string& line);
+    
+    // check functions
     bool is_int_array(const std::string& expression);
+    bool is_double_array(const std::string& expression);
+    bool is_bool_array(const std::string& expression);
+    bool is_char_array(const std::string& expression);
+    bool is_string_array(const std::string& expression);
+    bool is_float_array(const std::string& expression);
     bool defined_array(const std::string& name);
+
+    bool start_cout(const std::string& str);
+    bool start_cin(const std::string& str);
+    bool start_if(const std::string& str);
+    bool start_while(const std::string& str);
 
 public: 
     void print_int_arrays();
+    void print_double_arrays();
+    void print_char_arrays();
+    void print_bool_arrays();
+    void print_string_arrays();
+    void print_float_arrays();
 
 public:
     // Read and store in map
@@ -128,6 +153,8 @@ private:
             return int_variables[name];
         } else if (is_double_variable(name)) {
             return double_variables[name];
+        } else if (is_float_variable(name)) {
+            return float_variables[name];
         } else if (is_bool_variable(name)) {
             return bool_variables[name];
         } else if (is_char_variable(name)) {
@@ -138,9 +165,31 @@ private:
             return std::stod(name);
         } else if (is_char_literal(name)) {
             return name[1];
-        } else {
-            throw std::runtime_error("Variable " + name + " is not defined.");
+        } else if (is_bool_literal(name)) {
+            return (name == "true") ? true : false;
         }
+        return 0;
+    }
+
+    template <typename T>
+    T get_arr_value(const std::string& name, const std::string& index)
+    {
+        int array_index = std::stoi(index);
+        if (is_int_array(name)) {
+            return int_array[name][array_index];
+        } else if (is_double_array(name)) {
+            return double_array[name][array_index];
+        } else if (is_char_array(name)) {
+            return char_array[name][array_index];
+        } else if (is_bool_array(name)) {
+            return bool_array[name][array_index];
+        } else if (is_float_array(name)) {
+            return float_array[name][array_index];
+        } 
+        // else if (is_string_array(name)) {
+        //     return string_array[name][array_index];
+        // }
+        return 0;
     }
     
 public:
@@ -166,6 +215,11 @@ private:
     std::unordered_map<int, std::pair<int, int>> while_map;
 
     std::map<std::string, std::vector<int>> int_array;
+    std::map<std::string, std::vector<double>> double_array;
+    std::map<std::string, std::vector<char>> char_array;
+    std::map<std::string, std::vector<bool>> bool_array;
+    std::map<std::string, std::vector<std::string>> string_array;
+    std::map<std::string, std::vector<float>> float_array;
 
 };
 

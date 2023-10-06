@@ -58,7 +58,15 @@ void Parser::assignment_operator_parse(const std::string& op1, const std::string
     } else if (is_char_variable(op1)) {
         char_variables[op1] = get_value<char>(op2);
     } else if (is_string_variable(op1)) {
-        string_variables[op1] = string_variables[op2];
+        if (is_string_variable(op2)) {
+            string_variables[op1] = string_variables[op2];
+        } else if (is_string_literal(op2)) {
+            // std::string tmp = op2;
+            // tmp = tmp.substr(1);
+            // tmp.pop_back();
+            // string_variables[op1] = tmp;
+            string_variables[op1] = get_string(op2);
+        }
     } else {
         throw std::runtime_error("Not declare variable");
     }

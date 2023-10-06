@@ -26,7 +26,7 @@ std::string Parser::trim(const std::string& str)
 bool Parser::is_variable_declaration(std::string& line, int address)
 {
     //std::cout << "declaration" << std::endl;
-    std::cout << line << std::endl;
+    // std::cout << line << std::endl;
     // Check if the line starts with one of the data types
     const std::vector<std::string> data_types = {"char", "bool", "int", "float", "double", "string"};
 
@@ -125,6 +125,37 @@ bool Parser::is_number(const std::string& expression)
     }
 
     return true; // All characters are digits
+}
+
+std::string Parser::get_string(const std::string& expression)
+{
+    std::string tmp = expression;
+    tmp = tmp.substr(1);
+    tmp.pop_back();
+    return tmp;
+}
+
+// Checks if the given expression represents a bool literal
+bool Parser::is_bool_literal(const std::string& expression)
+{
+    if (expression == "true" || expression == "false") {
+        return true;
+    }
+    return false;
+}
+
+// Checks if the given expression represents a bool literal
+bool Parser::is_string_literal(const std::string& expression) 
+{
+    // Check if the string is enclosed in double quotes
+    if (expression.size() >= 2 && expression.front() == '"' && expression.back() == '"') {
+        return true;
+    } else if (expression.size() >= 2 && expression.front() == '"' && expression.back() != '"') {
+        throw std::runtime_error("You forgot the '\"'");
+    } else if (expression.size() >= 2 && expression.front() != '"' && expression.back() == '"') {
+        throw std::runtime_error("You forgot the '\"'");
+    }
+    return false;
 }
 
 // Checks if the given code line contains references to the iostream library
@@ -240,13 +271,43 @@ bool Parser::defined_variable(const std::string& name)
 // Checks if the given variable name is defined array
 bool Parser::defined_array(const std::string& name)
 {
-    return is_int_array(name);
+    return is_int_array(name) || is_double_array(name) || is_char_array(name) || is_bool_array(name) || is_string_array(name) || is_float_array(name);
 }
 
 // Checks if the given expression represents an int array
 bool Parser::is_int_array(const std::string& expression)
 {
     return int_array.find(expression) != int_array.end();
+}
+
+// Checks if the given expression represents an double array
+bool Parser::is_double_array(const std::string& expression)
+{
+    return double_array.find(expression) != double_array.end();
+}
+
+// Checks if the given expression represents an double array
+bool Parser::is_char_array(const std::string& expression)
+{
+    return char_array.find(expression) != char_array.end();
+}
+
+// Checks if the given expression represents an bool array
+bool Parser::is_bool_array(const std::string& expression)
+{
+    return bool_array.find(expression) != bool_array.end();
+}
+
+// Checks if the given expression represents an string array
+bool Parser::is_string_array(const std::string& expression)
+{
+    return string_array.find(expression) != string_array.end();
+}
+
+// Checks if the given expression represents an float array
+bool Parser::is_float_array(const std::string& expression)
+{
+    return float_array.find(expression) != float_array.end();
 }
 
 // Checks if the given expression represents a character literal
@@ -279,124 +340,16 @@ bool Parser::is_decrement_expression(const std::string& op1, const std::string& 
 
 bool Parser::is_array_manipulation(const std::string& line)
 {
+    //std::cout << "line: "  << line << std::endl;
     size_t pos1 = line.find('[');
     size_t pos2 = line.find(']');
 
-    if (pos1 == std::string::npos || pos2 == std::string::npos) {
+    // std::cout << std::boolalpha << start_cout(line) << std::endl;
+
+    if (pos1 == std::string::npos || pos2 == std::string::npos || start_cout(line) || start_cin(line) || start_if(line) | start_while(line)) {
         return false;
     }
     return true;
-}
-
-void Parser::extract_array_components(const std::string& arr_string, std::string& name, std::string& index) 
-{
-    size_t start = arr_string.find('[');
-    size_t end = arr_string.find(']');
-
-    if (start != std::string::npos && end != std::string::npos) {
-        name = arr_string.substr(0, start);
-        index = arr_string.substr(start + 1, end - start - 1);
-    }
-}
-
-void Parser::parse_array_manipulation(const std::string& line) 
-{
-    std::string tmp_name_arr {};
-    std::string index {};
-    std::string assignment {};
-    std::string value {};
-
-    std::istringstream iss(line);
-
-    iss >> tmp_name_arr >> assignment >> value;
-
-    // Extract array components
-    std::string array_name;
-    extract_array_components(tmp_name_arr, array_name, index);
-
-    std::cout << "array_name: " << array_name << std::endl;
-    std::cout << "index: " << index << std::endl;
-
-    execute_array_assignment_statement(array_name, index, assignment, value);
-}
-
-void Parser::execute_array_assignment_statement(const std::string& array_name, const std::string& index, const std::string& assignment, const std::string& value)
-{
-    if (!defined_array(array_name)) {
-        throw std::runtime_error("Not defined array: " + array_name);
-    }
-
-    // Convert index to size_t
-    int array_index = get_value<int>(index);
-    
-    if (is_int_array(array_name)) {
-        int_array[array_name][array_index] = get_value<int>(value);
-    }
-}
-
-bool Parser::is_array_declaration(const std::string& line)
-{
-    //std::cout << "array" << std::endl;
-    std::cout << line << std::endl;
-    // Check if the line starts with one of the data types
-    const std::vector<std::string> data_types = {"char", "bool", "int", "float", "double", "string"};
-
-    int is_type = false;
-    for (const std::string& data_type : data_types) {
-        if (line.find(data_type) == 0) {
-            is_type = true;
-
-            size_t pos1 = line.find('[');
-            size_t pos2 = line.find(']');
-
-            if (pos1 == std::string::npos || pos2 == std::string::npos) {
-                is_type = false;
-            }
-        }
-    }
-
-    // Check if the line ends with a semicolon
-    if (is_type && line[line.size() - 1] != ';') {
-        std::cout << "i am here" << std::endl;
-        throw std::runtime_error("You forgot the ; in the following line:");
-    }
-    return is_type;
-}
-
-void Parser::parse_array_statement(const std::string& line)
-{
-    std::string op1 {};
-    std::string op2 {};
-    std::string op3 {};
-
-    std::istringstream iss(line);
-    iss >> op1 >> op2 >> op3;
-
-    op3.erase(std::remove(op3.begin(), op3.end(), ';'), op3.end());
-
-    std::cout << "op1: " << op1 << std::endl;
-    std::cout << "op2: " << op2 << std::endl;
-    std::cout << "op3: " << op3 << std::endl;
-
-    if (defined_array(op2) || defined_variable(op2)) {
-        throw std::runtime_error("Redefinition");
-    }
-
-    op3 = op3.substr(1);
-    op3.pop_back();
-
-    int size_array;
-
-    if (is_number(op3) || is_int_variable(op3)) {
-        size_array = get_value<int>(op3);
-    }
-
-    if (size_array < 0) {
-        throw std::runtime_error("Array size cannot be negative");
-    }
-
-    // Initialize the integer array with zeros
-    int_array[op2] = std::vector<int>(size_array, 0);
 }
 
 // main parse function
@@ -425,9 +378,7 @@ void Parser::parse()
                 parse_iostream(trimmed_line, found_iostream);
                 ++address;
                 continue;
-            }
-
-            if (!found_main && found_iostream) {
+            } else if (!found_main && found_iostream) {
                 parse_main(trimmed_line, found_main);
                 ++address;
                 continue;
@@ -440,14 +391,12 @@ void Parser::parse()
             }
 
             if (is_array_declaration(trimmed_line)) {
-                std::cout << "daa" << std::endl;
                 parse_array_statement(trimmed_line);
                 ++address;
                 continue;
             }
 
             if (is_array_manipulation(trimmed_line)) {
-                std::cout << "manipulation" << std::endl;
                 parse_array_manipulation(trimmed_line);
                 ++address;
                 continue;
