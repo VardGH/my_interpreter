@@ -70,9 +70,6 @@ bool Parser::start_while(const std::string& str)
 // Function to execute array assignment statements
 void Parser::execute_array_assignment_statement(const std::string& array_name, const std::string& index, const std::string& assignment, const std::string& value)
 {
-    // std::cout << array_name << std::endl;
-    // std::cout << std::boolalpha << start_cout(array_name);
-    // std::cout << std::boolalpha << defined_array(array_name);
     if (!defined_array(array_name) && !start_cout(array_name) && !start_cin(array_name)) {
         throw std::runtime_error("Not defined array: " + array_name);
     }
@@ -120,8 +117,6 @@ void Parser::execute_array_assignment_statement(const std::string& array_name, c
 // Function to check if a line is an array declaration
 bool Parser::is_array_declaration(const std::string& line)
 {
-    //std::cout << "array" << std::endl;
-    //std::cout << line << std::endl;
     // Check if the line starts with one of the data types
     const std::vector<std::string> data_types = {"char", "bool", "int", "float", "double", "string"};
 
@@ -203,7 +198,6 @@ void Parser::parse_array_statement(const std::string& line)
 // Function for brace initialization of arrays
 void Parser::brace_init_array(const std::string& line)
 {
-    //std::cout << "brace_init" << std::endl;
     // Find the position of the opening and closing braces
     size_t openingBracePos = line.find('{');
     size_t closingBracePos = line.find('}');
@@ -232,12 +226,6 @@ void Parser::brace_init_array(const std::string& line)
     while (std::getline(iss2, element, ',')) {
         elements.push_back(trim(element));
     }
-
-    //std::cout << "Initialized array '" << array_name << "': ";
-    // for (const auto& elem : elements) {
-    //     std::cout << elem << " ";
-    // }
-    // std::cout << std::endl;
 
     if (op1 == "int") {
         std::vector<int> int_elements;

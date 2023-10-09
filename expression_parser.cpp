@@ -84,14 +84,11 @@ void Parser::parse_assignment_expression(const std::string& op1, const std::stri
         } else if (some_operator == "/") {
             float_variables[op1] = get_value<float>(op2) / get_value<float>(op3);
         }
-    } 
-    // else if (is_string_variable(op1)) {
-    //     std::cout << "////////" << std::endl;
-    //     if (some_operator == "+") {
-    //         std::cout << "////////" << std::endl;
-    //         string_variables[op1] = string_variables[op2] + string_variables[op3];
-    //     }
-    // }
+    } else if (is_string_variable(op1)) {
+        if (some_operator == "+") {
+            string_variables[op1] = string_variables[op2] + string_variables[op3];
+        }
+    }
 }
 
 // If variable id defined we can =, +=, -=, /=, *=
@@ -130,13 +127,6 @@ void Parser::parse_variable_declaration(std::string& line, int address)
     std::string expression {};
 
     iss >> type >> name >> assignment >> expression;
-
-    // will be deleted
-    // std::cout << "type: " << type << std::endl;
-    // std::cout << "name: " << name << std::endl;
-    // std::cout << "assignment: " << assignment << std::endl;
-    // std::cout << "expression: " << expression << std::endl;
-    // std::cout << std::endl;
 
     if (type != "" && name == "=") {
         std::cout << "You forgot the name: " << address << std::endl;
